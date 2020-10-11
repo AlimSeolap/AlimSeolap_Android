@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "199564306366",
+    "firebase_url": "https://alimseolap-95650.firebaseio.com",
+    "project_id": "alimseolap-95650",
+    "storage_bucket": "alimseolap-95650.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:199564306366:android:9bc083924df78b6ac0fbef",
+        "android_client_info": {
+          "package_name": "com.whysly.alimseolap1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "199564306366-1nook5hee72bec4bvdoui3k77ifs4r1j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4cc27zDx3IKYlaspv4EpPZ6b0DAcwjmE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "199564306366-1nook5hee72bec4bvdoui3k77ifs4r1j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

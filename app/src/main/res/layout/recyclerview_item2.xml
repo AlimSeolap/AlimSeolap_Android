@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    android:layout_marginBottom="3dp"
+    android:layout_marginTop="6dp"
+
+    android:background="@drawable/shadow2">
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/app_icon"
+            android:layout_width="11dp"
+            android:layout_height="11dp"
+            android:layout_gravity="top"
+            android:layout_marginLeft="18dp"
+            android:layout_marginTop="12dp"
+            android:src="@drawable/login_logo"
+             />
+
+        <TextView
+            android:id="@+id/app_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6.13dp"
+            android:layout_marginTop="9.7dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="appname"
+            android:textSize="9.3dp" />
+
+
+        <TextView
+            android:id="@+id/noti_category"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginLeft="6.13dp"
+            android:layout_marginTop="17.29dp"
+            android:textSize="11.3dp"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/noti_id"
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="5dp" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+<!--
+        <TextView
+            android:id="@+id/notititle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="notititle"
+            android:textStyle="bold" />
+
+            -->
+
+
+        <TextView
+            android:id="@+id/notititle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="17.83dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginRight="17.46dp"
+            android:fontFamily="@font/notosanskr_medium"
+            android:text="TextView"
+            android:textColor="#3F4040"
+            android:textSize="11.8dp" />
+
+        <TextView
+            android:id="@+id/notitext"
+            android:textSize="9.4dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="17.83dp"
+            android:layout_marginRight="17.46dp"
+            android:layout_marginTop="6dp"
+            android:text="notitext"/>
+
+        <TextView
+        android:id="@+id/noti_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="6.86dp"
+        android:textSize="8.35dp"
+
+        android:layout_marginRight="17.46dp"
+        android:layout_gravity="right"
+        android:text="noti_date" />
+
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/extra_sub_text"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_margin="5dp"-->
+        <!--            android:text="extra_sub_text" />-->
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/packge_name"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_margin="5dp"-->
+        <!--            android:text="packge_name" />-->
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/extra_info_text"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_margin="5dp"-->
+        <!--            android:text="extra_info_text" />-->
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/extra_people_list"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_margin="5dp"-->
+        <!--            android:text="extra_people_list" />-->
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/extra_picture"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_margin="5dp"-->
+        <!--            android:text="extra_picture" />-->
+
+        <!--                <TextView-->
+        <!--            android:id="@+id/extra_summary_text"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_margin="5dp"-->
+        <!--            android:text="extra_summary_text" />-->
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/extra_massage"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_margin="5dp"-->
+        <!--            android:text="extra_massage" />-->
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/group_name"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_margin="5dp"-->
+        <!--            android:text="group_name" />-->
+
+        <!--        <TextView-->
+        <!--            android:id="@+id/app_string"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_margin="5dp"-->
+        <!--            android:text="app_string" />-->
+
+    </LinearLayout>
+
+</LinearLayout>
