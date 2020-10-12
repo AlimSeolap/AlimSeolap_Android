@@ -43,6 +43,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.gson.JsonObject;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.LogoutResponseCallback;
 import com.nhn.android.naverlogin.OAuthLogin;
@@ -50,7 +51,11 @@ import com.whysly.alimseolap1.R;
 import com.whysly.alimseolap1.Util.GoogleSignInOptionSingleTone;
 import com.whysly.alimseolap1.Util.LoginMethod;
 import com.whysly.alimseolap1.interfaces.MainInterface;
+import com.whysly.alimseolap1.interfaces.MyService;
+import com.whysly.alimseolap1.models.Message;
 import com.whysly.alimseolap1.models.NotiData;
+import com.whysly.alimseolap1.models.databases.NotificationDatabase;
+import com.whysly.alimseolap1.models.entities.NotificationEntity;
 import com.whysly.alimseolap1.services.NotificationCrawlingService;
 import com.whysly.alimseolap1.ui.login.LoginActivity;
 import com.whysly.alimseolap1.views.Adapters.ContentsPagerAdapter;
@@ -59,9 +64,17 @@ import com.whysly.alimseolap1.views.Fragment.MainFragment;
 import com.whysly.alimseolap1.views.Fragment.SettingsFragment;
 import com.whysly.alimseolap1.views.Fragment.SortFragment;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class MainActivity extends BaseActivity implements MainInterface.View {
@@ -88,7 +101,7 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
         }
     };
 
-
+    String server_noti_id;
 
     public static Context getContextOfApplication(){
         return mContext;
@@ -98,6 +111,65 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
             @Override
             protected void onCreate(Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
+                SharedPreferences pref = getSharedPreferences("data", Activity.MODE_PRIVATE);
+
+                if(pref.getString("login_method","") == ""){
+                    Intent loginIntent = new Intent(this, LoginActivity.class);
+                    startActivity(loginIntent);
+                }
+                else {
+
+
+                    SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+
+                    NotificationDatabase db = NotificationDatabase.getNotificationDatabase(getApplicationContext());
+                    final Retrofit retrofit = new Retrofit.Builder()
+                            .baseUrl("http://172.30.1.18:8000/")
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build();
+                    MyService service = retrofit.create(MyService.class);
+
+                    Call<List<Message>> call_user_message = service.getUserMessages(pref.getString("token", ""));
+                    call_user_message.enqueue(new Callback<List<Message>>() {
+                        @Override
+                        public void onResponse(Call<List<Message>> call, Response<List<Message>> response) {
+                            List<Message> messages = response.body();
+
+                            for (int i = 0; i < messages.size(); i++) {
+                                Message m = messages.get(i);
+                                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                                Date date = new Date();
+                                server_noti_id = String.valueOf(m.getUsers_messages_id());
+                                Log.d("server_noti_id", String.valueOf(m.getUsers_messages_id()));
+                                db.notificationDao().insertNotification(new NotificationEntity("com.google.chrome", m.getTitle(), m.getTitle(), m.getContent(), date, m.getUsers_messages_id()));
+
+
+                                JsonObject jsonObject = new JsonObject();
+                                jsonObject.addProperty("checked", "true");
+                                Call<JsonObject> call_patchChecked = service.patchChecked(pref.getString("token", ""), server_noti_id, jsonObject);
+                                call_patchChecked.enqueue(new Callback<JsonObject>() {
+                                    @Override
+                                    public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                                        Log.d("알림확인패치성공", response.body().toString());
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<JsonObject> call, Throwable t) {
+                                        Log.d("알림확인패치오류", t.toString());
+                                    }
+                                });
+
+
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<Message>> call, Throwable t) {
+
+                        }
+                    });
+
 
 //                WindowManager.LayoutParams window = new WindowManager.LayoutParams();
 //                window.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
@@ -110,9 +182,7 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
 //                finish();
 
 
-
-                SharedPreferences pref = getSharedPreferences("data", Activity.MODE_PRIVATE);
-                boolean checkFirst = pref.getBoolean("checkFirst", false);
+                    boolean checkFirst = pref.getBoolean("checkFirst", false);
 //                if(checkFirst == false) {
 //
 //                    SharedPreferences.Editor editor = pref.edit();
@@ -128,24 +198,17 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
 //
 //        }
 
-                // 브로드캐스트 리시버. 방송보내면 여기서 액티비티를 recreate()해줌.
-                LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver,
-                        new IntentFilter("refresh"));
+                    // 브로드캐스트 리시버. 방송보내면 여기서 액티비티를 recreate()해줌.
+                    LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver,
+                            new IntentFilter("refresh"));
 
 
-
-                FacebookSdk.sdkInitialize(getApplicationContext());
-                AppEventsLogger.activateApp(getApplication());
-                AccessToken accessToken = AccessToken.getCurrentAccessToken();
-
-
-                if(pref.getString("login_method","") == ""){
-                    Intent loginIntent = new Intent(this, LoginActivity.class);
-                    startActivity(loginIntent);
-                }
+                    FacebookSdk.sdkInitialize(getApplicationContext());
+                    AppEventsLogger.activateApp(getApplication());
+                    AccessToken accessToken = AccessToken.getCurrentAccessToken();
 
 
-        // 이미 구글 파이어베이스 로그인 되어있을 경우
+                    // 이미 구글 파이어베이스 로그인 되어있을 경우
 //        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 //        if (user != null) {
 //            LoginMethod.setLoginMethod("google");
@@ -175,48 +238,47 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
 //        }
 
 //        CsvTry csvTry = new CsvTry(getApplicationContext());
-        //csvTry.generateCsvFile();
+                    //csvTry.generateCsvFile();
 
 
-        setContentView(R.layout.activity_main);
+                    setContentView(R.layout.activity_main);
 
-        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-        StrictMode.setVmPolicy(builder.build());
+                    StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+                    StrictMode.setVmPolicy(builder.build());
 
-        mContext = getApplicationContext();
-        tab_layout = (TabLayout) findViewById(R.id.tab_layout);
+                    mContext = getApplicationContext();
+                    tab_layout = (TabLayout) findViewById(R.id.tab_layout);
 
-        //뷰페이저 설정
-        ViewPager pager = findViewById(R.id.pager);
-        tab_layout.getTabAt(0).setText("모두보기");
-        tab_layout.getTabAt(1).setText("추려보기");
-        tab_layout.getTabAt(2).setText("설정");
-
-
-        //캐싱을 해놓을 프래그먼트 개수
-        pager.setOffscreenPageLimit(3);
-
-        //getSupportFragmentManager로 프래그먼트 참조가능
-        ContentsPagerAdapter adapter = new ContentsPagerAdapter(getSupportFragmentManager());
-
-        MainFragment mainFragment = new MainFragment();
-        adapter.addItem(mainFragment);
-
-        SortFragment sortFragment = new SortFragment();
-        adapter.addItem(sortFragment);
-
-        SettingsFragment settingsFragment = new SettingsFragment();
-        adapter.addItem(settingsFragment);
+                    //뷰페이저 설정
+                    ViewPager pager = findViewById(R.id.pager);
+                    tab_layout.getTabAt(0).setText("모두보기");
+                    tab_layout.getTabAt(1).setText("추려보기");
+                    tab_layout.getTabAt(2).setText("설정");
 
 
+                    //캐싱을 해놓을 프래그먼트 개수
+                    pager.setOffscreenPageLimit(3);
 
-        pager.setAdapter(adapter);
+                    //getSupportFragmentManager로 프래그먼트 참조가능
+                    ContentsPagerAdapter adapter = new ContentsPagerAdapter(getSupportFragmentManager());
 
-        //뷰페이저와 탭레이아웃 연동
-        tab_layout.setupWithViewPager(pager);
+                    MainFragment mainFragment = new MainFragment();
+                    adapter.addItem(mainFragment);
+
+                    SortFragment sortFragment = new SortFragment();
+                    adapter.addItem(sortFragment);
+
+                    SettingsFragment settingsFragment = new SettingsFragment();
+                    adapter.addItem(settingsFragment);
 
 
-        //initComponent();
+                    pager.setAdapter(adapter);
+
+                    //뷰페이저와 탭레이아웃 연동
+                    tab_layout.setupWithViewPager(pager);
+
+
+                    //initComponent();
 
 
 
@@ -234,38 +296,38 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
         recyclerViewAdapter = new RecyclerViewAdapter(fragmentTabsStore.getActivity(), notiData);
         recyclerView.setAdapter(recyclerViewAdapter);
   */
-        //initToolbar();
+                    //initToolbar();
 
 
-        checkStoragePermission();
+                    checkStoragePermission();
 
 
-        Intent service_intent = new Intent(this, NotificationCrawlingService.class);
+                    Intent service_intent = new Intent(this, NotificationCrawlingService.class);
 
-        if(!isServiceRunningCheck()){
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-                Log.d("준영", "버전이 오레오 이상이라서 포그라운로 서비스 실행");
-                startForegroundService(service_intent);
-            } else {
-                Log.d("준영", "버전이 오레오 미만이라서 일반 서비스 실행");
-                startService(service_intent);
-            }
-        }
-
-
+                    if (!isServiceRunningCheck()) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            Log.d("준영", "버전이 오레오 이상이라서 포그라운로 서비스 실행");
+                            startForegroundService(service_intent);
+                        } else {
+                            Log.d("준영", "버전이 오레오 미만이라서 일반 서비스 실행");
+                            startService(service_intent);
+                        }
+                    }
 
 
-        if (!isPermissionGranted()) {
-            // 접근 혀용이 되어있지 않다면 1. 메시지 발생 / 2, 설정으로 이동시킴
-            Toast.makeText(getApplicationContext(), getString(R.string.app_name) + " 앱의 알림 권한을 허용해주세요.", Toast.LENGTH_LONG).show();
+                    if (!isPermissionGranted()) {
+                        // 접근 혀용이 되어있지 않다면 1. 메시지 발생 / 2, 설정으로 이동시킴
+                        Toast.makeText(getApplicationContext(), getString(R.string.app_name) + " 앱의 알림 권한을 허용해주세요.", Toast.LENGTH_LONG).show();
 //            WindowManager.LayoutParams windowManagerParams = new WindowManager.LayoutParams(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
 //                    WindowManager.LayoutParams.FLAG_FULLSCREEN, PixelFormat.TRANSLUCENT);
 //            wm = (WindowManager) getSystemService(WINDOW_SERVICE);
 //            LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
 //            v =  inflater.inflate(R.layout.floating_guide, null);
-            startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+                        startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
 //            wm.addView(v, windowManagerParams);
-        }
+                    }
+
+                }
 
 
 

@@ -99,13 +99,19 @@ public class LoginActivity extends AppCompatActivity   {
     FrameLayout  btn_kakao_test;
     CallbackManager callbackManager;
     LoginButton signInButtonFacebook;
-
+    SharedPreferences pref;
+    Retrofit retrofit;
 
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        retrofit = new Retrofit.Builder()
+                .baseUrl("http://172.30.1.18:8000/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        pref = getSharedPreferences("data", MODE_PRIVATE);
         context = LoginActivity.this;
         mOAuthLoginModule = OAuthLogin.getInstance();
         mOAuthLoginModule.init(
@@ -349,10 +355,7 @@ public class LoginActivity extends AppCompatActivity   {
 
 
     private void updateUiWithUser(LoggedInUserView model) {
-        final Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://172.30.1.18:8000/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+
         Log.d("현우", "Retrofit 빌드 성공");
 //            NotificationDatabase db = NotificationDatabase.getNotificationDatabase(getContext());
 //            user_id = db.notificationDao().loadNotification(noti_id).user_id;
@@ -365,7 +368,6 @@ public class LoginActivity extends AppCompatActivity   {
         jsonObject.addProperty("sns_type", LoginMethod.getLoginMethod());
         jsonObject.addProperty("sns_uid", LoginMethod.getSnsUid());
         jsonObject.addProperty("sns_token", LoginMethod.getSnsToken());
-        jsonObject.addProperty("profile_img", LoginMethod.getProfilePicUrl());
 
         Call<JsonObject> call = service.postSignUpSNS(jsonObject);
         call.enqueue(new Callback<JsonObject>() {
@@ -376,17 +378,19 @@ public class LoginActivity extends AppCompatActivity   {
                 Log.d("postSignUpSNS", response.body().toString());
                 try {
                     JSONObject object1 = new JSONObject(response.body().toString());
-                    SharedPreferences pref = getSharedPreferences("data", MODE_PRIVATE);
                     SharedPreferences.Editor editor = pref.edit();
                     editor.remove("token");
                     editor.putString("token", object1.getString("token"));
                     editor.putString("username", LoginMethod.getUserName());
-                    editor.putString("profilepicurl", LoginMethod.getProfilePicUrl());
+                    editor.putString("profilepic_path", LoginMethod.getProfilePicUrl());
                     editor.putString("login_method", LoginMethod.getLoginMethod());
                     editor.apply();
                     JSONArray movieArray = object1.getJSONArray("user");
                     String what = movieArray.getJSONObject(0).getJSONObject("fields").getString("age");
                     Log.d("what", what);
+
+                    loadUserfromServer();
+
                     if(what.equals("1")) {
                         Intent intent = new Intent(context, EditMyProfile.class);
                         startActivity(intent);
@@ -420,8 +424,56 @@ public class LoginActivity extends AppCompatActivity   {
             }
 
 
+
+
+
         });
 
+
+
+
+
+
+
+    }
+
+    public void loadUserfromServer(){
+        MyService service = retrofit.create(MyService.class);
+        Call<JsonObject> call_userinfo = service.getMe(pref.getString("token", ""));
+        call_userinfo.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+
+                try {
+                    SharedPreferences.Editor editor = pref.edit();
+                    JSONObject object = new JSONObject(response.body().toString());
+                    if (object.getString("profile_img") != null) {
+                        editor.putString("profilepic_path", object.getString("profile_img"));
+                    } else {
+                        editor.putString("profilepic_path", LoginMethod.getProfilePicUrl());
+                    }
+                    editor.apply();
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("등록성공");
+                Log.d("postSignUpSNS", response.toString());
+                Log.d("postSignUpSNS", response.body().toString());
+
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                System.out.println("등록실패");
+                Toast.makeText(getApplicationContext(), "로그인에 실패하였습니다.", Toast.LENGTH_LONG).show();
+                Log.d("postSignUpSNS", t.getMessage());
+                Log.d("postSignUpSNS", t.toString());
+            }
+
+
+        });
 
     }
 

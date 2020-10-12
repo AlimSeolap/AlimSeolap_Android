@@ -1,6 +1,8 @@
 package com.whysly.alimseolap1.views.Fragment;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -57,6 +59,7 @@ public class NegFragment extends Fragment {
 
     final public Handler handler1 = new Handler();
     final public Handler handler2 = new Handler();
+    SharedPreferences pref;
 
 
     @Nullable
@@ -66,13 +69,13 @@ public class NegFragment extends Fragment {
         ActionBar actionBar = ((MainActivity)getActivity()).getSupportActionBar();
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         LottieAnimationView lottieAnimationView = view.findViewById(R.id.empty_noti);
-
+        pref = getContext().getSharedPreferences("data", Context.MODE_PRIVATE);
 
         recyclerView =(RecyclerViewEmptySupport) view.findViewById(R.id.recycler1);
         linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
-
+        pref = getContext().getSharedPreferences("data", Context.MODE_PRIVATE);
 
         recyclerView.setLayoutManager(linearLayoutManager);
         //recyclerView.setLayoutManager(linearLayoutManager);
@@ -201,7 +204,7 @@ public class NegFragment extends Fragment {
                     @Override
                     public void run() {
 
-                        model.updateRealEvaluation(id,1);
+                        model.updateRealEvaluation(id,1, pref.getString("token",""));
                         //Do something after 100ms
                         System.out.println("981217" + id);
                     }
@@ -220,7 +223,7 @@ public class NegFragment extends Fragment {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        model.updateRealEvaluation(id,-1);
+                        model.updateRealEvaluation(id,-1, pref.getString("token",""));
                         System.out.println("981217" + id);
                         //Do something after 100ms
                     }

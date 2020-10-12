@@ -9,7 +9,7 @@ public class LoginMethod {
     private static String LOGIN_METHOD = "";
     private static String USER_NAME = "알리미";
     private static String PROFILE_PIC_URL;
-    private static String EMAIL = "";
+    private static String EMAIL = "nulluser@gmail.com";
     private static String SNS_TOKEN = "default";
     private static String SNS_UID;
     private static Context applicationContext = MainActivity.getContextOfApplication();

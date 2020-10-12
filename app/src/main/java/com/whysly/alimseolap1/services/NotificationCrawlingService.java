@@ -159,7 +159,6 @@ public class NotificationCrawlingService extends NotificationListenerService {
                 "service",
                 "reminder",
                 "error",
-
                 "event"
         ));
 
@@ -253,8 +252,8 @@ public class NotificationCrawlingService extends NotificationListenerService {
 
             postNotificationToW2V();
             NotificationDatabase db = NotificationDatabase.getNotificationDatabase(context);
-            db.notificationDao().insertNotification(ne);
-            Log.d("현우", "DB 저장완료");
+//            db.notificationDao().insertNotification(ne);
+//            Log.d("현우", "DB 저장완료");
 
             //MainViewModel model = new ViewModelProvider(getApplication(), new ViewModelProvider.AndroidViewModelFactory(requireActivity.getApplication())).get(MainViewModel.class);
 

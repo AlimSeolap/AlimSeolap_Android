@@ -8,8 +8,11 @@ import com.whysly.alimseolap1.models.Province;
 import com.whysly.alimseolap1.models.State;
 
 import java.util.List;
+import java.util.Map;
 
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -18,6 +21,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.PartMap;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -31,6 +35,11 @@ public interface MyService {
 
     @POST("messages/{id}")
     Call<JsonObject> postGameMessageEval(@Header("Authorization") String value, @Path("id") String id, @Body JsonObject jsonObject);
+
+
+
+
+
 
     @GET("ages")
     Call<List<Age>> getAges();
@@ -50,11 +59,23 @@ public interface MyService {
     @GET("messages")
     Call<List<Message>> getMessages(@Header("Authorization") String value);
 
+    @GET("user/messages")
+    Call<List<Message>> getUserMessages(@Header("Authorization") String value);
+
 //    @PATCH("me")
 //    Call<JsonObject> patchMe(@Header("Authorization") String value, @Body JsonObject jsonObject);
 
+
+
+
     @Multipart
     @PATCH("me")
-    Call<JsonObject> patchMe(@Header("Authorization") String value, @Part("nickname") RequestBody nickname, @Part("gender") RequestBody gender, @Part("age") RequestBody age, @Part("area") RequestBody area, @Part("profile_image") RequestBody profile_image, @Part("password") RequestBody password);
+    Call<ResponseBody> patchMe(@Header("Authorization") String value, @PartMap Map<String, RequestBody> m, @Part MultipartBody.Part profile_img);
+
+    @PATCH("user/messages/{id}/checked")
+    Call<JsonObject> patchChecked(@Header("Authorization") String value, @Path("id") String id, @Body JsonObject jsonObject);
+
+    @PATCH("user/messages/{id}/evaluation")
+    Call<JsonObject> patchEvaluation(@Header("Authorization") String value , @Path("id") String id, @Body JsonObject jsonObject);
 
 }

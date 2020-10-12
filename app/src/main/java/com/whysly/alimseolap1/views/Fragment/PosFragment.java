@@ -1,6 +1,8 @@
 package com.whysly.alimseolap1.views.Fragment;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -22,9 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.google.gson.JsonObject;
 import com.whysly.alimseolap1.R;
-import com.whysly.alimseolap1.interfaces.MyService;
 import com.whysly.alimseolap1.models.databases.NotificationDatabase;
 import com.whysly.alimseolap1.views.Activity.MainActivity;
 import com.whysly.alimseolap1.views.Activity.MainViewModel;
@@ -33,12 +33,6 @@ import com.whysly.alimseolap1.views.Adapters.RecyclerViewEmptySupport;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class PosFragment extends Fragment {
     RecyclerViewAdapter recyclerViewAdapter;
@@ -57,7 +51,7 @@ public class PosFragment extends Fragment {
 
     final public Handler handler1 = new Handler();
     final public Handler handler2 = new Handler();
-
+    SharedPreferences pref;
 
     @Nullable
     @Override
@@ -66,7 +60,7 @@ public class PosFragment extends Fragment {
         ActionBar actionBar = ((MainActivity)getActivity()).getSupportActionBar();
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         LottieAnimationView lottieAnimationView = view.findViewById(R.id.empty_noti);
-
+        pref = getContext().getSharedPreferences("data", Context.MODE_PRIVATE);
 
         recyclerView =(RecyclerViewEmptySupport) view.findViewById(R.id.recycler1);
         linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
@@ -201,7 +195,7 @@ public class PosFragment extends Fragment {
                         @Override
                         public void run() {
 
-                            model.updateRealEvaluation(id,1);
+                            model.updateRealEvaluation(id,1, pref.getString("token",""));
                             //Do something after 100ms
                             System.out.println("981217" + id);
                         }
@@ -220,7 +214,7 @@ public class PosFragment extends Fragment {
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            model.updateRealEvaluation(id,-1);
+                            model.updateRealEvaluation(id,-1, pref.getString("token",""));
                             System.out.println("981217" + id);
                             //Do something after 100ms
                         }
@@ -259,55 +253,7 @@ public class PosFragment extends Fragment {
 
             System.out.println(user_id + notititle);
 
-            final Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("http://13.125.130.16/")
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-            Log.d("현우", "Retrofit 빌드 성공");
 
-//            NotificationDatabase db = NotificationDatabase.getNotificationDatabase(getContext());
-//            user_id = db.notificationDao().loadNotification(noti_id).user_id;
-//            notititle = db.notificationDao().loadNotification(noti_id).title;
-
-
-
-
-            MyService service = retrofit.create(MyService.class);
-            //json 객체 생성하여 값을 넣어줌
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("app_name", app_name);
-            jsonObject.addProperty("package_name", "X");
-            jsonObject.addProperty("title", notititle);
-            jsonObject.addProperty("content", notitext);
-            jsonObject.addProperty("subContent", category);
-            jsonObject.addProperty("noti_date", noti_date2);
-            jsonObject.addProperty("user_id", user_id);
-            jsonObject.addProperty("user_value", evaluate);
-
-            System.out.println(app_name + " / " + notititle + " / " + notitext + " / " + noti_date1 + " / " + evaluate + " / " + user_id );
-
-
-
-
-            Call<JsonObject> call = service.createPost(jsonObject);
-            call.enqueue(new Callback<JsonObject>() {
-                @Override
-                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    System.out.println("알림데이터 전송성공");
-                    Log.d("현우", response.toString());
-                    Log.d("현우", retrofit.toString());
-
-
-                }
-
-                @Override
-                public void onFailure(Call<JsonObject> call, Throwable t) {
-                    System.out.println("알림데이터 전송실패");
-                    Log.d("현우", t.toString());
-
-
-                }
-            });
         }
     };
 }

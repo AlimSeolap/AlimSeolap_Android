@@ -76,7 +76,7 @@ public class MainFragment_backup extends Fragment {
     WebSettings settings;
     final public Handler handler1 = new Handler();
     final public Handler handler2 = new Handler();
-
+    SharedPreferences pref = getContext().getSharedPreferences("data", Context.MODE_PRIVATE);
 
     @Nullable
     @Override
@@ -437,7 +437,7 @@ public class MainFragment_backup extends Fragment {
                         @Override
                         public void run() {
 
-                            model.updateRealEvaluation(id,1);
+                            model.updateRealEvaluation(id,1, pref.getString("token",""));
                             //Do something after 100ms
                             System.out.println("981217" + id);
                         }
@@ -456,7 +456,7 @@ public class MainFragment_backup extends Fragment {
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            model.updateRealEvaluation(id,-1);
+                            model.updateRealEvaluation(id,-1, pref.getString("token",""));
                             System.out.println("981217" + id);
                             //Do something after 100ms
                         }
