@@ -276,7 +276,7 @@ public class ExpandableExampleAdapter
 //      holder.notiTitle.setText(data.getNotiTitle());
             Log.d("준영", childPosition + " 번째 알림의 extra_Title은 " + data.title + " 입니다.");
         holder.notiText.setText(data.content);
-        Log.d("준영", childPosition + " 번째 알림의 extra_text은 " + data.pakage_name + " 입니다.");
+        Log.d("준영", childPosition + " 번째 알림의 extra_text은 " + data.redirecting_url + " 입니다.");
 //        holder.extra_info_text.setText("extra_info_text : " + data.getExtra_info_text());
 //        Log.d("준영", position + " 번째 알림의 extra_info_text은 " + data.getExtra_info_text() + " 입니다.");
 //        holder.extra_people_list.setText("extra_people_text : " + data.getExtra_people_list());
@@ -298,7 +298,7 @@ public class ExpandableExampleAdapter
         Log.d("준영", childPosition + " 번째 알림의 noti_date은 " + data.arrive_time.toString() + " 입니다.");
 
         try{
-            Drawable icon = context.getPackageManager().getApplicationIcon(data.pakage_name);
+            Drawable icon = context.getPackageManager().getApplicationIcon(data.redirecting_url);
             holder.icon.setImageDrawable(icon);
 
         }
@@ -310,7 +310,7 @@ public class ExpandableExampleAdapter
         final PackageManager pm = context.getPackageManager();
         ApplicationInfo ai;
         try {
-            ai = context.getPackageManager().getApplicationInfo(data.pakage_name, 0);
+            ai = context.getPackageManager().getApplicationInfo(data.redirecting_url, 0);
         } catch (final PackageManager.NameNotFoundException e) {
             ai = null;
         }

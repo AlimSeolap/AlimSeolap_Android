@@ -6,6 +6,7 @@ import com.whysly.alimseolap1.models.City;
 import com.whysly.alimseolap1.models.Message;
 import com.whysly.alimseolap1.models.Province;
 import com.whysly.alimseolap1.models.State;
+import com.whysly.alimseolap1.models.UserKeyword;
 
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,9 @@ public interface MyService {
 
     @POST("api/noti_data/")
     Call<JsonObject> createPost(@Body JsonObject jsonObject);
+
+    @POST("sign-in")
+    Call<JsonObject> postSignIn(@Body JsonObject jsonObject);
 
     @POST("auth")
     Call<JsonObject> postSignUpSNS(@Body JsonObject jsonObject);
@@ -61,6 +65,9 @@ public interface MyService {
 
     @GET("user/messages")
     Call<List<Message>> getUserMessages(@Header("Authorization") String value);
+
+    @GET("users/keywords")
+    Call<List<UserKeyword>> getUsersKeyword(@Header("Authorization") String value);
 
 //    @PATCH("me")
 //    Call<JsonObject> patchMe(@Header("Authorization") String value, @Body JsonObject jsonObject);

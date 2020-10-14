@@ -19,7 +19,6 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.asksira.dropdownview.DropDownView;
 import com.asksira.dropdownview.OnDropDownSelectionListener;
@@ -77,7 +76,7 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
     TextView agerange1;
     TextView agerange2;
     TextView email;
-    TextView password_view;
+    TextView nickname;
     Button malebtn;
     Button femalebtn;
     TextView username;
@@ -109,6 +108,7 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
 
     HashMap<String,String> map1 = new HashMap<String,String>();
     HashMap<String,String> map2 = new HashMap<String,String>();
+    String from = "default";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -123,9 +123,7 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
         area_name_3 = findViewById(R.id.area3);
 
         email = findViewById(R.id.editTextEmail);
-        password_view = findViewById(R.id.editTextPassword);
-
-
+        nickname = findViewById(R.id.nickname_edit);
 
 
 
@@ -135,24 +133,103 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
         listarea2 = new ArrayList<>();
         listarea3 = new ArrayList<>();
         yourFilterList.add("초등학교 저학년");
-        yourFilterList.add("10대");
+        yourFilterList.add("초등학교 고학년");
+        yourFilterList.add("중학생");
+        yourFilterList.add("10대 후반");
         yourFilterList.add("20대");
         yourFilterList.add("30대");
         yourFilterList.add("40대");
         yourFilterList.add("50대");
         yourFilterList.add("60대");
-        yourFilterList.add("70대");
+        yourFilterList.add("70대 이상");
         yourFilterList2.add("초반");
         yourFilterList2.add("중반");
         yourFilterList2.add("후반");
         username = findViewById(R.id.username);
-
         final Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://172.30.1.18:8000/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
+        pref = getSharedPreferences("data", MODE_PRIVATE);
         service = retrofit.create(MyService.class);
+        Intent intent = getIntent();
+        String email_text = intent.getStringExtra("email");
+        String password = intent.getStringExtra("password");
+        from = intent.getStringExtra("from");
+
+        if (from.equals("signup")) {
+            this.email.setText(email_text);
+            this.email.setEnabled(false);
+        } else {
+
+            Call<JsonObject> call_userinfo = service.getMe(pref.getString("token", ""));
+            call_userinfo.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    System.out.println("등록성공");
+                    Log.d("postSignUpSNS", response.toString());
+                    Log.d("postSignUpSNS", response.body().toString());
+                    try {
+                        object = new JSONObject(response.body().toString());
+                        username.setText(object.getString("nickname"));
+                        nickname.setText(object.getString("nickname"));
+                        email.setText(object.getString("email"));
+                        email.setEnabled(false);
+                        age_code = String.valueOf(object.getInt("age_id"));
+                        area_code = String.valueOf(object.getInt("area_id"));
+                        String gen = object.getString("gender");
+                        String age = object.getJSONObject("age").get("age").toString();
+                        JSONObject area = object.getJSONObject("area");
+                        if(age_code.equals(1)) {
+                            ageIsSelected = false;
+                            areaIsSelected = false;
+                        } else {
+                            ageIsSelected = true;
+                            areaIsSelected = true;
+                        }
+                        area_name_1.setText(area.getString("state"));
+                        area_name_2.setText(area.getString("city"));
+                        area_name_3.setText(area.getString("province"));
+                        agerange1.setText(age);
+                        SharedPreferences.Editor editor = pref.edit();
+                        if (object.getString("profile_img") != null) {
+                            editor.putString("profilepic_path", object.getString("profile_img"));
+                            editor.apply();
+                            Log.d("파일경로", pref.getString("profilepic_path", ""));
+                        }
+                        if(gen.equals("M")){
+                            malebtn.setSelected(true);
+                            malebtn.setTextColor(Color.parseColor("#FFFFFF"));
+                            femalebtn.setSelected(false);
+                            femalebtn.setTextColor(Color.parseColor("#F2B41B"));
+                        }else if (gen.equals("F")){
+                            malebtn.setSelected(false);
+                            malebtn.setTextColor(Color.parseColor("#FFFFFF"));
+                            femalebtn.setSelected(true);
+                            femalebtn.setTextColor(Color.parseColor("#F2B41B"));
+                        }else if (gen.equals("1")){
+                            malebtn.setSelected(false);
+                            malebtn.setTextColor(Color.parseColor("#F2B41B"));
+                            femalebtn.setSelected(false);
+                            femalebtn.setTextColor(Color.parseColor("#F2B41B"));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    System.out.println("등록실패");
+                    Toast.makeText(getApplicationContext(), "로그인에 실패하였습니다.", Toast.LENGTH_LONG).show();
+                    Log.d("postSignUpSNS", t.getMessage());
+                    Log.d("postSignUpSNS", t.toString());
+                }
+            });
+
+        }
+
+
 
         Call<List<Age>> call_age = service.getAges();
         call_age.enqueue(new Callback<List<Age>>() {
@@ -193,74 +270,9 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
 
             }
         });
-        pref = getSharedPreferences("data", MODE_PRIVATE);
-        Log.d("EditMyProfile, 저장된토큰값",pref.getString("token", ""));
-        Call<JsonObject> call_userinfo = service.getMe(pref.getString("token", ""));
-        call_userinfo.enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                System.out.println("등록성공");
-                Log.d("postSignUpSNS", response.toString());
-                Log.d("postSignUpSNS", response.body().toString());
-                try {
-                     object = new JSONObject(response.body().toString());
-
-                     username.setText(object.getString("nickname"));
-                     email.setText(object.getString("email"));
-                     age_code = String.valueOf(object.getInt("age_id"));
-                     area_code = String.valueOf(object.getInt("area_id"));
-                     String gen = object.getString("gender");
-                     String age = object.getJSONObject("age").get("age").toString();
-                     JSONObject area = object.getJSONObject("area");
-                     if(age_code.equals(1)) {
-                         ageIsSelected = false;
-                         areaIsSelected = false;
-                         gameReady = true;
-                     } else {
-                         ageIsSelected = true;
-                         areaIsSelected = true;
-                     }
-                     area_name_1.setText(area.getString("state"));
-                     area_name_2.setText(area.getString("city"));
-                     area_name_3.setText(area.getString("province"));
-                     agerange1.setText(age);
-                     SharedPreferences.Editor editor = pref.edit();
-                     if (object.getString("profile_img") != null) {
-                         editor.putString("profilepic_path", object.getString("profile_img"));
-                         editor.apply();
-                         Log.d("파일경로", pref.getString("profilepic_path", ""));
-                     }
-                     if(gen.equals("M")){
-                         malebtn.setSelected(true);
-                         malebtn.setTextColor(Color.parseColor("#FFFFFF"));
-                         femalebtn.setSelected(false);
-                         femalebtn.setTextColor(Color.parseColor("#F2B41B"));
-                     }else if (gen.equals("F")){
-                         malebtn.setSelected(false);
-                         malebtn.setTextColor(Color.parseColor("#FFFFFF"));
-                         femalebtn.setSelected(true);
-                         femalebtn.setTextColor(Color.parseColor("#F2B41B"));
-                     }else if (gen.equals("1")){
-                         malebtn.setSelected(false);
-                         malebtn.setTextColor(Color.parseColor("#F2B41B"));
-                         femalebtn.setSelected(false);
-                         femalebtn.setTextColor(Color.parseColor("#F2B41B"));
-                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                System.out.println("등록실패");
-                Toast.makeText(getApplicationContext(), "로그인에 실패하였습니다.", Toast.LENGTH_LONG).show();
-                Log.d("postSignUpSNS", t.getMessage());
-                Log.d("postSignUpSNS", t.toString());
-            }
 
 
-        });
+
         //listarea1.add()
 
 
@@ -280,14 +292,17 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
         dropDownView.setOnSelectionListener(new OnDropDownSelectionListener() {
             @Override
             public void onItemSelected(DropDownView view, int position) {
-                if (position > 0 && position < 7) {
+                if (position > 3 && position < 9) {
                     dropDownView2.setVisibility(View.VISIBLE);
-
+                    ageIsSelected = false;
+                    dropDownView2.expand(true);
+                } else {
+                    dropDownView2.setVisibility(View.INVISIBLE);
+                    age_code = map1.get(agerange1.getText().toString());
+                    ageIsSelected = true;
                 }
-                ageIsSelected = false;
-
                 agerange1.setText(dropDownView.getFilterTextView().getText());
-                dropDownView2.expand(true);
+
 
                 //Do something with the selected position
             }
@@ -301,6 +316,8 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                 //Do something with the selected position
                 ageIsSelected = true;
                 age_code = map1.get(agerange1.getText().toString());
+                System.out.println(age_code + map1.toString());
+
             }
         });
 
@@ -458,7 +475,7 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                 break ;
             case R.id.edit_profile_submit_btn :
                 if(agerange2.getVisibility() != view.VISIBLE || area_name_3.getVisibility() != view.VISIBLE
-                        || email.getVisibility() != view.VISIBLE || password_view.getVisibility() != view.VISIBLE)
+                        || email.getVisibility() != view.VISIBLE || nickname.getVisibility() != view.VISIBLE)
                 {
                 }
                 saveAllandPatch();
@@ -501,10 +518,12 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
             Toast.makeText(getApplicationContext(), "성별을 입력해 주세요.", Toast.LENGTH_LONG).show();
         } else if(email.getText().length() == 0 ){
             Toast.makeText(getApplicationContext(), "이메일 주소를 입력해 주세요.", Toast.LENGTH_LONG).show();
+        } else if(nickname.length() == 0){
+            Toast.makeText(getApplicationContext(), "닉네임을 입력해 주세요.", Toast.LENGTH_LONG).show();
         } else {
             File file = new File(pref.getString("new_profilepic_path", ""));
             RequestBody nickname = RequestBody.create(MediaType.parse("text/plain"),
-                    username.getText().toString());
+                    this.nickname.getText().toString());
             RequestBody gender = RequestBody.create(MediaType.parse("text/plain"),
                     "M");
             System.out.println(age_code + "헤헤" + area_code);
@@ -514,19 +533,22 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
 
             //RequestBody profile_img = RequestBody.create(MediaType.parse("multipart/form-data"),file);
             RequestBody password = RequestBody.create(MediaType.parse("text/plain"),
-                    password_view.getText().toString());
+                    this.nickname.getText().toString());
             JsonObject jsonObject = new JsonObject();
             RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
             MultipartBody.Part profile_img = MultipartBody.Part.createFormData("profile_img", file.getName(), requestFile);
             //MultipartBody.Part filePart = MultipartBody.Part.createFormData("profile_img", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
+
+            if(pref.getString("new_profilepic_path", "").equals("")){
+                profile_img = null;
+            }
 
             Map<String, RequestBody> map = new HashMap<>();
             map.put("nickname", nickname);
             map.put("age", age);
             map.put("area", area);
             map.put("gender", gender);
-            map.put("password", password);
-
+            //map.put("password", password);
 
             //@Part MultipartBody.Part filePart
             Call<ResponseBody> call_patchMe = service.patchMe(pref.getString("token", ""), map, profile_img);
@@ -545,23 +567,20 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                     System.out.println("등록실패");
                     Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
                 }
-
-
             });
-
-
-
         }
-
-
-
-
-
     }
 
     public void complete(){
-        Intent intent = new Intent("refresh");
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
+        Toast.makeText(this, "정보가 저장되었습니다", Toast.LENGTH_SHORT).show();
+    }
+
+    public void game(){
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
         finish();
         Toast.makeText(this, "정보가 저장되었습니다", Toast.LENGTH_SHORT).show();
     }
@@ -652,7 +671,6 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
             };
 
             new AlertDialog.Builder(this,R.style.Theme_AppCompat_Dialog_Alert)
-
                     .setTitle("업로드할 이미지 선택")
                     .setPositiveButton("사진촬영", cameraListener)
                     .setNeutralButton("취소", cancelListener)

@@ -35,7 +35,7 @@ public interface NotificationDao {
     @Delete
     public void deleteNotifications(List<NotificationEntity> notificationEntities);
 
-    @Query("UPDATE NotificationEntity SET this_user_real_evaluation = :this_user_real_evaluation WHERE id = :id")
+    @Query("UPDATE NotificationEntity SET this_user_real_evaluation = :this_user_real_evaluation WHERE id = :id ")
     public void updateRealEvaluation(long id, long this_user_real_evaluation);
 
     @Query("SELECT COUNT(*) FROM notificationentity ")

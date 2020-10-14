@@ -22,19 +22,17 @@ import java.util.Date;
 //})
 @Entity
 public class NotificationEntity {
-
-        public NotificationEntity(String pakage_name, String app_name, String title, String content, Date arrive_time, long server_id) {
-                this.pakage_name = pakage_name;
+        public NotificationEntity(int user_id, String redirecting_url, String app_name, String title, String content, Date arrive_time, long server_id) {
+                this.user_id = user_id;
+                this.redirecting_url = redirecting_url;
                 this.app_name = app_name;
                 this.title = title;
                 this.content = content;
                 this.arrive_time = arrive_time;
                 this.server_id = server_id;
-
         }
 
         public NotificationEntity() {
-
         }
 
         @PrimaryKey(autoGenerate = true)
@@ -42,7 +40,7 @@ public class NotificationEntity {
 
         //알림 수신 즉시 저장하는 값입니다.
         public String app_name;
-        public String pakage_name;
+        public String redirecting_url;
         public String title;
         public String content;
         public String cls_intent;

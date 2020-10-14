@@ -53,6 +53,7 @@ import com.kakao.auth.ApiErrorCode;
 import com.kakao.auth.AuthType;
 import com.kakao.auth.ISessionCallback;
 import com.kakao.auth.Session;
+import com.kakao.auth.authorization.accesstoken.AccessToken;
 import com.kakao.network.ErrorResult;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.MeV2ResponseCallback;
@@ -62,6 +63,7 @@ import com.nhn.android.naverlogin.OAuthLogin;
 import com.nhn.android.naverlogin.OAuthLoginHandler;
 import com.nhn.android.naverlogin.data.OAuthLoginState;
 import com.whysly.alimseolap1.R;
+import com.whysly.alimseolap1.Util.BackPressedForFinish;
 import com.whysly.alimseolap1.Util.GoogleSignInOptionSingleTone;
 import com.whysly.alimseolap1.Util.LoginMethod;
 import com.whysly.alimseolap1.interfaces.MyService;
@@ -101,16 +103,20 @@ public class LoginActivity extends AppCompatActivity   {
     LoginButton signInButtonFacebook;
     SharedPreferences pref;
     Retrofit retrofit;
+    BackPressedForFinish bp;
+    MyService service;
 
-
-
+    String what;
+//ActivityCompat.finishAffinity(this);
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        bp = new BackPressedForFinish(this);
         retrofit = new Retrofit.Builder()
                 .baseUrl("http://172.30.1.18:8000/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+        service = retrofit.create(MyService.class);
         pref = getSharedPreferences("data", MODE_PRIVATE);
         context = LoginActivity.this;
         mOAuthLoginModule = OAuthLogin.getInstance();
@@ -158,14 +164,15 @@ public class LoginActivity extends AppCompatActivity   {
                                }
                            }
                        });
+                   LoginMethod.setEMAIL("fb_"+Profile.getCurrentProfile().getId()+"@user.user");
                    LoginMethod.setLoginMethod("facebook");
                    String.valueOf(loginResult.getAccessToken());
                    String.valueOf(Profile.getCurrentProfile().getName());
+                   LoginMethod.setSnsUid(Profile.getCurrentProfile().getId());
                    LoginMethod.setSnsToken(loginResult.getAccessToken().toString());
                    LoginMethod.setProfilePicUrl(String.valueOf(Profile.getCurrentProfile().getProfilePictureUri(100,100)));
                    LoginMethod.setUserName(String.valueOf(Profile.getCurrentProfile().getName()));
                    updateUiWithUser(new LoggedInUserView(String.valueOf(Profile.getCurrentProfile().getName())));
-
                }
 
                @Override
@@ -178,10 +185,6 @@ public class LoginActivity extends AppCompatActivity   {
 
            }
        });
-
-
-
-
 
         GoogleSignInOptionSingleTone gso = new GoogleSignInOptionSingleTone();
 
@@ -216,10 +219,9 @@ public class LoginActivity extends AppCompatActivity   {
                     showLoginFailed(loginResult.getError());
                 }
                 if (loginResult.getSuccess() != null) {
-                    updateUiWithUser(loginResult.getSuccess());
+                    //loadUserfromServer();
                 }
                 setResult(Activity.RESULT_OK);
-
                 //Complete and destroy login activity once successful
                 finish();
             }
@@ -261,11 +263,10 @@ public class LoginActivity extends AppCompatActivity   {
             public void onClick(View v) {
                 //loadingProgressBar.setVisibility(View.VISIBLE);
                 //얘들은 검증안하고 로그인 시킴 ㅋㅋ
-//                loginViewModel.login(usernameEditText.getText().toString(),
-//                        passwordEditText.getText().toString());
+                loginViewModel.login(usernameEditText.getText().toString(),
+                        passwordEditText.getText().toString());
                 signIn(usernameEditText.getText().toString(),
                         passwordEditText.getText().toString());
-
                // loadingProgressBar.setVisibility(View.INVISIBLE);
             }
         });
@@ -288,39 +289,31 @@ public class LoginActivity extends AppCompatActivity   {
 
 
     private void signIn(String email, String password) {
+        Log.d("안녕하세요" , email+ password);
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("email", email);
+        jsonObject.addProperty("password", password);
+        Call<JsonObject> call_signIn = service.postSignIn(jsonObject);
+        call_signIn.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                try {
+                    JSONObject object = new JSONObject(response.body().toString());
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("token",object.getString("token"));
+                    editor.putString("uid", object.getString("id"));
+                    editor.putString("login_method", "default");
+                    editor.apply();
+                    loadUserfromServer();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
 
-
-        // [START sign_in_with_email]
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("로그인 성공", "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUiWithUser(new LoggedInUserView(user));
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("로그인 실패", "signInWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "아이디 또는 비밀번호가 일치하지 않습니다.",
-                                    Toast.LENGTH_SHORT).show();
-                            updateUiWithUser(null);
-                            // [START_EXCLUDE]
-                            //checkForMultiFactorFailure(task.getException());
-                            // [END_EXCLUDE]
-                        }
-
-                        // [START_EXCLUDE]
-                        if (!task.isSuccessful()) {
-                            //mBinding.status.setText(R.string.auth_failed);
-                        }
-
-                        //hideProgressBar();
-                        // [END_EXCLUDE]
-                    }
-                });
-        // [END sign_in_with_email]
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+            }
+        });
     }
 
 
@@ -360,7 +353,7 @@ public class LoginActivity extends AppCompatActivity   {
 //            NotificationDatabase db = NotificationDatabase.getNotificationDatabase(getContext());
 //            user_id = db.notificationDao().loadNotification(noti_id).user_id;
 //            notititle = db.notificationDao().loadNotification(noti_id).title;
-        MyService service = retrofit.create(MyService.class);
+
         //json 객체 생성하여 값을 넣어줌
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("email", LoginMethod.getEMAIL());
@@ -375,7 +368,6 @@ public class LoginActivity extends AppCompatActivity   {
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 System.out.println("등록성공");
                 Log.d("postSignUpSNS", response.toString());
-                Log.d("postSignUpSNS", response.body().toString());
                 try {
                     JSONObject object1 = new JSONObject(response.body().toString());
                     SharedPreferences.Editor editor = pref.edit();
@@ -384,30 +376,15 @@ public class LoginActivity extends AppCompatActivity   {
                     editor.putString("username", LoginMethod.getUserName());
                     editor.putString("profilepic_path", LoginMethod.getProfilePicUrl());
                     editor.putString("login_method", LoginMethod.getLoginMethod());
+                    editor.putString("email", LoginMethod.getEMAIL());
                     editor.apply();
                     JSONArray movieArray = object1.getJSONArray("user");
-                    String what = movieArray.getJSONObject(0).getJSONObject("fields").getString("age");
-                    Log.d("what", what);
-
-                    loadUserfromServer();
-
-                    if(what.equals("1")) {
-                        Intent intent = new Intent(context, EditMyProfile.class);
-                        startActivity(intent);
-                    } else {
-                        String welcome = getString(R.string.welcome) + model.getDisplayName();
-                        // TODO : initiate successful logged in experience
-                        Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
-                        Intent login_success = new Intent(context, MainActivity.class);
-                        startActivity(login_success);
-                    }
-
-                    finish();
+                    what = movieArray.getJSONObject(0).getJSONObject("fields").getString("age");
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
+                loadUserfromServer();
 
 
 
@@ -438,29 +415,47 @@ public class LoginActivity extends AppCompatActivity   {
     }
 
     public void loadUserfromServer(){
-        MyService service = retrofit.create(MyService.class);
         Call<JsonObject> call_userinfo = service.getMe(pref.getString("token", ""));
+        Log.d("하하호호", pref.getString("token", ""));
         call_userinfo.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-
+                String name;
                 try {
                     SharedPreferences.Editor editor = pref.edit();
                     JSONObject object = new JSONObject(response.body().toString());
+                    editor.putString("username", object.getString("nickname"));
+                    editor.putString("email", object.getString("email"));
+                     name = object.getString("nickname");
+                     what = String.valueOf(object.getInt("age_id"));
                     if (object.getString("profile_img") != null) {
                         editor.putString("profilepic_path", object.getString("profile_img"));
                     } else {
                         editor.putString("profilepic_path", LoginMethod.getProfilePicUrl());
                     }
+                    editor.putString("uid", object.getString("id"));
                     editor.apply();
-
-
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    name = null;
                 }
+
                 System.out.println("등록성공");
                 Log.d("postSignUpSNS", response.toString());
                 Log.d("postSignUpSNS", response.body().toString());
+
+                if(what.equals("1")) {
+                    Intent intent = new Intent(context, EditMyProfile.class);
+                    intent.putExtra("from", "login");
+                    startActivity(intent);
+                } else {
+                    String welcome = getString(R.string.welcome) + name;
+                    // TODO : initiate successful logged in experience
+                    Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
+                    Intent login_success = new Intent(context, MainActivity.class);
+                    startActivity(login_success);
+                }
+                finish();
 
             }
 
@@ -492,6 +487,7 @@ public class LoginActivity extends AppCompatActivity   {
             case R.id.sign_up :
                 Intent sign_up_intent = new Intent(this, SignUpActivity.class);
                 startActivity(sign_up_intent);
+                finish();
                 break ;
 
             case R.id.naver_login :
@@ -521,6 +517,10 @@ public class LoginActivity extends AppCompatActivity   {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        bp.onBackPressed();
+    }
     /////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -574,8 +574,8 @@ public class LoginActivity extends AppCompatActivity   {
                 LoginMethod.setSnsToken(account.getIdToken());
                 LoginMethod.setProfilePicUrl(account.getPhotoUrl().toString());
                 LoginMethod.setLoginMethod("google");
-                LoginMethod.setUserName(mAuth.getCurrentUser().getDisplayName());
-                LoginMethod.setEMAIL(mAuth.getCurrentUser().getEmail());
+                LoginMethod.setUserName(account.getDisplayName());
+                LoginMethod.setEMAIL(account.getEmail());
                 LoginMethod.setSnsUid(account.getId());
                 updateUiWithUser(new LoggedInUserView(account.getDisplayName()));
 
@@ -792,6 +792,7 @@ public class LoginActivity extends AppCompatActivity   {
     private class SessionCallback implements ISessionCallback {
         @Override
         public void onSessionOpened() {
+
             UserManagement.getInstance().me(new MeV2ResponseCallback() {
                 @Override
                 public void onFailure(ErrorResult errorResult) {
@@ -812,22 +813,25 @@ public class LoginActivity extends AppCompatActivity   {
 
                 @Override
                 public void onSuccess(MeV2Response result) {
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    intent.putExtra("name", result.getNickname());
-                    intent.putExtra("profile", result.getProfileImagePath());
-
-
+                    //Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    //intent.putExtra("name", result.getNickname());
+                    //intent.putExtra("profile", result.getProfileImagePath());
+                    Log.d("카카오로그인", result.toString());
                     LoginMethod.setLoginMethod("kakao");
-                    LoginMethod.setUserName(result.getKakaoAccount().getProfile().getNickname());
-                    LoginMethod.setProfilePicUrl(result.getKakaoAccount().getProfile().getProfileImageUrl());
-                    LoginMethod.setSnsUid(result.getKakaoAccount().getDisplayId());
-                    LoginMethod.setSnsToken(result.getGroupUserToken());
+                    AccessToken accessToken;
+                    accessToken = Session.getCurrentSession().getTokenInfo();
+                    LoginMethod.setEMAIL(result.getKakaoAccount().getEmail());
+                    LoginMethod.setUserName(result.getKakaoAccount().getProfile().getNickname().toString());
+                    LoginMethod.setProfilePicUrl(result.getKakaoAccount().getProfile().getProfileImageUrl().toString());
+                    LoginMethod.setSnsUid(String.valueOf(result.getId()));
+                    LoginMethod.setSnsToken(accessToken.toString());
                     updateUiWithUser(new LoggedInUserView(result.getKakaoAccount().getProfile().getNickname()));
-                    startActivity(intent);
-                    finish();
+                    //startActivity(intent);
+                    //finish();
                     Toast.makeText(getApplicationContext(),"카카오톡 로그인에 성공하였습니다. ",Toast.LENGTH_SHORT).show();
 
                 }
+
             });
         }
 

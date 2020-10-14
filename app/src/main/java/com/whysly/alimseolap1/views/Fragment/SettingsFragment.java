@@ -20,11 +20,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.StringSignature;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.whysly.alimseolap1.R;
-import com.whysly.alimseolap1.Util.LoginMethod;
-
-import java.io.File;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -62,8 +60,6 @@ public class SettingsFragment extends Fragment {
         Toast.makeText(getContext(), latest_version,
                 Toast.LENGTH_SHORT).show();
         Log.i(TAG, "파이어베이스에서 받아온 최신 버전 정보 : "+latest_version);
-
-
         if(!MyAppVersion().equals(latest_version)) {
             version_stat.setText("업데이트 해주세요. 현재버전: " + MyAppVersion() + "최신버전: " + latest_version);
             version_check.setVisibility(View.GONE);
@@ -82,7 +78,6 @@ public class SettingsFragment extends Fragment {
         View view = inflater.inflate(R.layout.settings_fragment, null);
         update_button = view.findViewById(R.id.update_button);
         version_check = view.findViewById(R.id.version_check);
-
         CircleImageView ivImage = view.findViewById(R.id.profile_pic2);
         version_stat = view.findViewById(R.id.version_status);
         firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
@@ -107,21 +102,23 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        File file = new File(pref.getString("profilepic_path",pref.getString("profilepicurl", "")));
-        Log.d("pfpic_url", pref.getString("profilepic_path",pref.getString("profilepicurl", "")));
-        Uri imageUri = Uri.fromFile(file);
+//        File file = new File(pref.getString("profilepic_path",pref.getString("profilepicurl", "")));
+//        Log.d("pfpic_url", pref.getString("profilepic_path",pref.getString("profilepicurl", "")));
+//        Uri imageUri = Uri.fromFile(file);
 
         // Glide로 이미지 표시하기
         // String imageUrl = pref.getString("profilepic_path",pref.getString("profilepicurl", ""));
         // Glide로 이미지 표시하기
-        Glide.with(getContext()).load(imageUri)
-                .centerCrop()
+        Log.d("profilepic_path", pref.getString("profilepic_path",""));
+        Glide.with(getContext()).load(pref.getString("profilepic_path",""))
+//                .centerCrop()
 //                .placeholder(R.drawable.alimi_sample)
 //                .error(R.drawable.alimi_sample)
+                .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
                 .into(ivImage)
         ;
-        TextView username = view.findViewById(R.id.username);
-        username.setText(LoginMethod.getUserName());
+        TextView username = view.findViewById(R.id.username_display);
+        username.setText(pref.getString("username", "알리미"));
         return view;
     }
 

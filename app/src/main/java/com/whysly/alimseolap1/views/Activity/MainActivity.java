@@ -43,11 +43,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.google.gson.JsonObject;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.LogoutResponseCallback;
 import com.nhn.android.naverlogin.OAuthLogin;
 import com.whysly.alimseolap1.R;
+import com.whysly.alimseolap1.Util.BackPressedForFinish;
 import com.whysly.alimseolap1.Util.GoogleSignInOptionSingleTone;
 import com.whysly.alimseolap1.Util.LoginMethod;
 import com.whysly.alimseolap1.interfaces.MainInterface;
@@ -56,7 +56,6 @@ import com.whysly.alimseolap1.models.Message;
 import com.whysly.alimseolap1.models.NotiData;
 import com.whysly.alimseolap1.models.databases.NotificationDatabase;
 import com.whysly.alimseolap1.models.entities.NotificationEntity;
-import com.whysly.alimseolap1.services.NotificationCrawlingService;
 import com.whysly.alimseolap1.ui.login.LoginActivity;
 import com.whysly.alimseolap1.views.Adapters.ContentsPagerAdapter;
 import com.whysly.alimseolap1.views.Adapters.RecyclerViewAdapter;
@@ -100,8 +99,10 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
             recreate();
         }
     };
+    BackPressedForFinish bp;
 
     String server_noti_id;
+    SharedPreferences pref;
 
     public static Context getContextOfApplication(){
         return mContext;
@@ -110,12 +111,15 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
 
             @Override
             protected void onCreate(Bundle savedInstanceState) {
-                super.onCreate(savedInstanceState);
-                SharedPreferences pref = getSharedPreferences("data", Activity.MODE_PRIVATE);
 
-                if(pref.getString("login_method","") == ""){
+                bp = new BackPressedForFinish(this);
+                super.onCreate(savedInstanceState);
+                pref = getSharedPreferences("data", Activity.MODE_PRIVATE);
+
+                if(pref.getString("login_method","").equals("")){
                     Intent loginIntent = new Intent(this, LoginActivity.class);
                     startActivity(loginIntent);
+                    finish();
                 }
                 else {
 
@@ -123,7 +127,7 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
                     SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 
-                    NotificationDatabase db = NotificationDatabase.getNotificationDatabase(getApplicationContext());
+                    NotificationDatabase db = NotificationDatabase.getNotificationDatabase(getApplicationContext(), pref.getString("uid",""));
                     final Retrofit retrofit = new Retrofit.Builder()
                             .baseUrl("http://172.30.1.18:8000/")
                             .addConverterFactory(GsonConverterFactory.create())
@@ -135,32 +139,17 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
                         @Override
                         public void onResponse(Call<List<Message>> call, Response<List<Message>> response) {
                             List<Message> messages = response.body();
-
-                            for (int i = 0; i < messages.size(); i++) {
-                                Message m = messages.get(i);
-                                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                                Date date = new Date();
-                                server_noti_id = String.valueOf(m.getUsers_messages_id());
-                                Log.d("server_noti_id", String.valueOf(m.getUsers_messages_id()));
-                                db.notificationDao().insertNotification(new NotificationEntity("com.google.chrome", m.getTitle(), m.getTitle(), m.getContent(), date, m.getUsers_messages_id()));
-
-
-                                JsonObject jsonObject = new JsonObject();
-                                jsonObject.addProperty("checked", "true");
-                                Call<JsonObject> call_patchChecked = service.patchChecked(pref.getString("token", ""), server_noti_id, jsonObject);
-                                call_patchChecked.enqueue(new Callback<JsonObject>() {
-                                    @Override
-                                    public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                                        Log.d("알림확인패치성공", response.body().toString());
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<JsonObject> call, Throwable t) {
-                                        Log.d("알림확인패치오류", t.toString());
-                                    }
-                                });
-
-
+                            if(messages == null){
+                                return;
+                            } else {
+                                for (int i = 0; i < messages.size(); i++) {
+                                    Message m = messages.get(i);
+                                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                                    Date date = new Date();
+                                    server_noti_id = String.valueOf(m.getUsers_messages_id());
+                                    Log.d("server_noti_id", String.valueOf(m.getUsers_messages_id()));
+                                    db.notificationDao().insertNotification(new NotificationEntity(m.getUser(), m.getRedirecting_url(), m.getTitle(), m.getTitle(), m.getContent(), date, m.getUsers_messages_id()));
+                                }
                             }
                         }
 
@@ -169,6 +158,13 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
 
                         }
                     });
+
+
+
+
+
+
+
 
 
 //                WindowManager.LayoutParams window = new WindowManager.LayoutParams();
@@ -302,17 +298,17 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
                     checkStoragePermission();
 
 
-                    Intent service_intent = new Intent(this, NotificationCrawlingService.class);
-
-                    if (!isServiceRunningCheck()) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            Log.d("준영", "버전이 오레오 이상이라서 포그라운로 서비스 실행");
-                            startForegroundService(service_intent);
-                        } else {
-                            Log.d("준영", "버전이 오레오 미만이라서 일반 서비스 실행");
-                            startService(service_intent);
-                        }
-                    }
+//                    Intent service_intent = new Intent(this, NotificationCrawlingService.class);
+//
+//                    if (!isServiceRunningCheck()) {
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                            Log.d("준영", "버전이 오레오 이상이라서 포그라운로 서비스 실행");
+//                            startForegroundService(service_intent);
+//                        } else {
+//                            Log.d("준영", "버전이 오레오 미만이라서 일반 서비스 실행");
+//                            startService(service_intent);
+//                        }
+//                    }
 
 
                     if (!isPermissionGranted()) {
@@ -357,6 +353,7 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
         switch (view.getId()) {
             case R.id.edit_profile :
                 Intent intent = new Intent(this, EditMyProfile.class);
+                intent.putExtra("from","main");
                 startActivity(intent);
                 break ;
             case R.id.suggest :
@@ -374,29 +371,40 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
 
             case R.id.log_out :
                 SharedPreferences pref = getSharedPreferences("data", MODE_PRIVATE);
+                SharedPreferences.Editor editor = pref.edit();
                 Intent intent_logout = new Intent(this, LoginActivity.class);
                 intent_logout.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                NotificationDatabase db = NotificationDatabase.getNotificationDatabase(getApplicationContext(), pref.getString("uid",""));
                 switch (pref.getString("login_method", "")) {
+                    case "default":
+                        editor.clear().apply();
+                        startActivity(intent_logout);
+                        this.finish();
+                        break;
+
                     case "naver":
                         signOutNaver(getApplicationContext());
+                        db.destroyInstance();
                         Toast.makeText(this, "네이버1, 정상적으로 로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
-                        pref.edit().clear().apply();
+                        editor.clear().apply();
                         startActivity(intent_logout);
                         this.finish();
                         break;
 
                     case "google":
                         signOutGoogle(getApplicationContext());
+                        db.destroyInstance();
                         Toast.makeText(this, "구글, 정상적으로 로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
-                        pref.edit().clear().apply();
+                        editor.clear().apply();
                         startActivity(intent_logout);
                         this.finish();
                         break;
 
                     case "facebook":
                         LoginManager.getInstance().logOut();
+                        db.destroyInstance();
+                        editor.clear().apply();
                         startActivity(intent_logout);
-                        pref.edit().clear().apply();
                         Toast.makeText(this, "페이스북, 정상적으로 로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
                         break;
 
@@ -404,7 +412,8 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
                         UserManagement.getInstance().requestLogout(new LogoutResponseCallback() {
                             @Override
                             public void onCompleteLogout() {
-                                pref.edit().clear().apply();
+                                editor.clear().apply();
+                                db.destroyInstance();
                                 startActivity(intent_logout);
                             }
                         });
@@ -479,14 +488,10 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
 
     }
 
-
-
-
-
-
-
-
-
+    @Override
+    public void onBackPressed() {
+        bp.onBackPressed();
+    }
 
     /*private void initToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -583,7 +588,6 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
 
 
     public void send() {
-
         Intent email = new Intent(Intent.ACTION_SEND);
         email.setPackage("com.google.android.gm");
         email.setType("plain/Text");
@@ -592,9 +596,6 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
         email.putExtra(Intent.EXTRA_TEXT, "유저아이디 (UserID):" + LoginMethod.getUserName() + "\n기기명 (Device):\n안드로이드 OS (Android OS):\n내용 (Content):\n");
         email.setType("message/rfc822");
         startActivity(email);
-
-
-
     }
 
     @Override
@@ -602,11 +603,6 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
         super.onDestroy();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
     }
-
-
-
-
-
 }
 
 

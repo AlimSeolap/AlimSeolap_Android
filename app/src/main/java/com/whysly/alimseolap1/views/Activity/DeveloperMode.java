@@ -34,11 +34,10 @@ public class DeveloperMode extends AppCompatActivity {
             }
         });
 
-        SharedPreferences pref = getSharedPreferences("developer_mode", MODE_PRIVATE);
+        SharedPreferences pref = getSharedPreferences("data", MODE_PRIVATE);
         String defpass = "\"word\":\"freq\",\"알림서랍\":8,\"시각디자인\":8,\"CDO\":12,\"슬기로움\":6,\"안드로이드\":9,\"강민구\":10,\"디자이너\":6";
-        String pass = pref.getString("wordcloud_contents", defpass);
+        String pass = pref.getString("wordcloud", defpass);
         wordcloud_input.setText(pass);
-
         saveBtn.setOnClickListener(new View.OnClickListener() {
 
             @Override

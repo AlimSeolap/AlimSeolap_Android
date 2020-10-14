@@ -110,7 +110,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 //      holder.notiTitle.setText(data.getNotiTitle());
         Log.d("준영", position + " 번째 알림의 extra_Title은 " + data.title + " 입니다.");
             holder.notiText.setText(data.content);
-            Log.d("준영", position + " 번째 알림의 extra_text은 " + data.pakage_name + " 입니다.");
+            Log.d("준영", position + " 번째 알림의 extra_text은 " + data.redirecting_url + " 입니다.");
 //        holder.extra_info_text.setText("extra_info_text : " + data.getExtra_info_text());
 //        Log.d("준영", position + " 번째 알림의 extra_info_text은 " + data.getExtra_info_text() + " 입니다.");
 //        holder.extra_people_list.setText("extra_people_text : " + data.getExtra_people_list());
@@ -132,7 +132,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             Log.d("준영", position + " 번째 알림의 noti_date은 " + data.arrive_time.toString() + " 입니다.");
 
             try{
-            Drawable icon = activity.getPackageManager().getApplicationIcon(data.pakage_name);
+            Drawable icon = activity.getPackageManager().getApplicationIcon(data.redirecting_url);
             holder.icon.setImageDrawable(icon);
 
         }
@@ -144,7 +144,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         final PackageManager pm = activity.getPackageManager();
         ApplicationInfo ai;
         try {
-            ai = activity.getPackageManager().getApplicationInfo(data.pakage_name, 0);
+            ai = activity.getPackageManager().getApplicationInfo(data.redirecting_url, 0);
         } catch (final PackageManager.NameNotFoundException e) {
             ai = null;
         }
@@ -169,11 +169,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
 
 
-    public void removeItemView(int position) {
+    public void removeItemView(int position, String uid) {
         //db에서도 값을 지웁니다.
         Log.d("지웁니다", "noti_idx2: "+position);
         long long_noti_idx = getItemId(position);
-        NotificationDatabase  db = NotificationDatabase.getNotificationDatabase(activity);
+        NotificationDatabase  db = NotificationDatabase.getNotificationDatabase(context, uid);
         entities.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, entities.size()); // 지워진 만큼 다시 채워넣기.
@@ -225,11 +225,20 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+
+
                     //Intent intent = new Intent("intent_redirect");
                     //intent.putExtra("adapterposition", getAdapterPosition());
                     //LocalBroadcastManager.getInstance(activity).sendBroadcast(intent);
-                    String packageName = entities.get(getAdapterPosition()).pakage_name;
-                    OpenApp.openApp(context, packageName);
+                    if(entities.get(getAdapterPosition()).redirecting_url != null ) {
+                        String packageName = entities.get(getAdapterPosition()).redirecting_url;
+                        long server_id = entities.get(getAdapterPosition()).server_id;
+                        OpenApp.openApp(context, packageName, server_id);
+                    } else {
+
+                    }
+
+
 
                 }
             });
@@ -247,5 +256,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }
             });
         }
+    }
+
+
+    public void clicked() {
+
     }
 }

@@ -109,7 +109,7 @@ public class NotificationCrawlingService extends NotificationListenerService {
         context = getApplicationContext();
         appDatabase = AppDatabase.getAppDatabase(context);
         wordDatabase = WordDatabase.getWordDatabase(context);
-        notificationDatabase = NotificationDatabase.getNotificationDatabase(context);
+        //notificationDatabase = NotificationDatabase.getNotificationDatabase(context, pref.getString("user_id",""));
         pm = context.getPackageManager();
         notification = sbn.getNotification();
         Bundle extras = notification.extras;
@@ -213,7 +213,7 @@ public class NotificationCrawlingService extends NotificationListenerService {
             String time_string = format1.format(time);
             ne = new NotificationEntity();
             ne.app_name = app_name;
-            ne.pakage_name = pakage_name;
+            ne.redirecting_url = pakage_name;
             ne.title = extras.getString(notification.EXTRA_TITLE);
             ne.content = extras.getString(notification.EXTRA_TEXT);
             System.out.println(ne.content);
@@ -251,7 +251,7 @@ public class NotificationCrawlingService extends NotificationListenerService {
             ne.category = sbn.getNotification().category + sbn.describeContents();
 
             postNotificationToW2V();
-            NotificationDatabase db = NotificationDatabase.getNotificationDatabase(context);
+            NotificationDatabase db = NotificationDatabase.getNotificationDatabase(context, pref.getString("user_id",""));
 //            db.notificationDao().insertNotification(ne);
 //            Log.d("현우", "DB 저장완료");
 

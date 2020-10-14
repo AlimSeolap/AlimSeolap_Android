@@ -9,7 +9,7 @@ public class Message {
     private int id;
     private String title;
     private String content;
-    private String redirectingUrl;
+    private String redirecting_url;
     private String targetGender;
     private String type;
     private Boolean attach;
@@ -46,12 +46,12 @@ public class Message {
         this.content = content;
     }
 
-    public String getRedirectingUrl() {
-        return redirectingUrl;
+    public String getRedirecting_url() {
+        return redirecting_url;
     }
 
-    public void setRedirectingUrl(String redirectingUrl) {
-        this.redirectingUrl = redirectingUrl;
+    public void setRedirecting_url(String redirecting_url) {
+        this.redirecting_url = redirecting_url;
     }
 
     public String getTargetGender() {

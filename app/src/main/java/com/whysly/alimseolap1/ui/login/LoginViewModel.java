@@ -54,6 +54,19 @@ public class LoginViewModel extends ViewModel {
         }
     }
 
+
+    public void signUpDataChanged(String username, String password, String confirmPassword) {
+        if (!isUserNameValid(username)) {
+            loginFormState.setValue(new LoginFormState(R.string.invalid_username, null));
+        } else if (!isPasswordValid(password)) {
+            loginFormState.setValue(new LoginFormState(null, R.string.invalid_password));
+        } else if(!password.equals(confirmPassword)){
+            loginFormState.setValue(new LoginFormState(null, null, R.string.password_does_not_match));
+        } else {
+            loginFormState.setValue(new LoginFormState(true));
+        }
+    }
+
     // A placeholder username validation check
     private boolean isUserNameValid(String username) {
         if (username == null) {

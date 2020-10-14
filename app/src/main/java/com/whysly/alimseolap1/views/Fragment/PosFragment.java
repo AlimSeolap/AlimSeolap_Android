@@ -188,7 +188,7 @@ public class PosFragment extends Fragment {
                     final int id = noti_id;
 
 
-                    recyclerViewAdapter.removeItemView(noti_position);
+                    recyclerViewAdapter.removeItemView(noti_position, pref.getString("uid", ""));
 
                     final Handler handler = new Handler(Looper.getMainLooper());
                     handler.postDelayed(new Runnable() {
@@ -207,7 +207,7 @@ public class PosFragment extends Fragment {
                     evaluate = "false";
                     int user_eval = -1;
                     //model.updateRealEvaluation(noti_id , -1);
-                    recyclerViewAdapter.removeItemView(noti_position);
+                    recyclerViewAdapter.removeItemView(noti_position, pref.getString("uid", ""));
                     final int id = noti_id;
 
                     final Handler handler = new Handler(Looper.getMainLooper());

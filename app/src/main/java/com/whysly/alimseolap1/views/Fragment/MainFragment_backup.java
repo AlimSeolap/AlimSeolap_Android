@@ -282,7 +282,7 @@ public class MainFragment_backup extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             NotificationDatabase database;
-            database = NotificationDatabase.getNotificationDatabase(getActivity());
+            database = NotificationDatabase.getNotificationDatabase(getActivity(), pref.getString("uid", ""));
             System.out.println(intent.getIntExtra("adapterposition",0));
 
            // pendingIntent = database.notificationDao().loadNotification(intent.getIntExtra("adapterposition",0)+1).cls_intent;
@@ -430,7 +430,7 @@ public class MainFragment_backup extends Fragment {
                     final int id = noti_id;
 
 
-                    recyclerViewAdapter.removeItemView(noti_position);
+                    recyclerViewAdapter.removeItemView(noti_position, pref.getString("uid", ""));
 
                     final Handler handler = new Handler(Looper.getMainLooper());
                     handler.postDelayed(new Runnable() {
@@ -449,7 +449,7 @@ public class MainFragment_backup extends Fragment {
                     evaluate = "false";
                     int user_eval = -1;
                     //model.updateRealEvaluation(noti_id , -1);
-                    recyclerViewAdapter.removeItemView(noti_position);
+                    recyclerViewAdapter.removeItemView(noti_position, pref.getString("uid", ""));
                     final int id = noti_id;
 
                     final Handler handler = new Handler(Looper.getMainLooper());

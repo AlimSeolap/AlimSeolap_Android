@@ -1,6 +1,8 @@
 package com.whysly.alimseolap1.views.Activity;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -37,8 +39,9 @@ public class MainViewModel extends AndroidViewModel {
 
     public MainViewModel(@NonNull Application application) {
         super(application);
+        SharedPreferences pref = application.getSharedPreferences("data", Context.MODE_PRIVATE);
 
-        ndb = NotificationDatabase.getNotificationDatabase(application);
+        ndb = NotificationDatabase.getNotificationDatabase(application, pref.getString("uid",""));
         notiDao = ndb.notificationDao();
         entities_all = notiDao.loadAllNotificationLiveData();
         entities_positive = notiDao.loadPositiveNotificationLiveData();

@@ -19,9 +19,9 @@ public abstract class  NotificationDatabase extends RoomDatabase {
 
     public abstract NotificationDao notificationDao();
 
-    public static NotificationDatabase getNotificationDatabase(Context context) {
+    public static NotificationDatabase getNotificationDatabase(Context context, String uid) {
         if (notificationDatabase == null) {
-            notificationDatabase = Room.databaseBuilder(context.getApplicationContext(), NotificationDatabase.class, "notification-db")
+            notificationDatabase = Room.databaseBuilder(context.getApplicationContext(), NotificationDatabase.class, uid)
                     .allowMainThreadQueries()
                     .build();
         }

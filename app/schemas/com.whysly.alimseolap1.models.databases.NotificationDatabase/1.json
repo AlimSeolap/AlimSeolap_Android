@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "bb0e23972738dc87eea13c783b214fbd",
+    "identityHash": "b8919b064d800fd6e31e1d8d40c26077",
     "entities": [
       {
         "tableName": "NotificationEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_name` TEXT, `pakage_name` TEXT, `title` TEXT, `content` TEXT, `cls_intent` TEXT, `imageFile_path` TEXT, `user_id` INTEGER NOT NULL, `arrive_time` INTEGER, `pendingIntent` TEXT, `category` TEXT, `server_id` INTEGER NOT NULL, `first_prime_word_id` INTEGER NOT NULL, `second_prime_word_id` INTEGER NOT NULL, `third_prime_word_id` INTEGER NOT NULL, `fourth_prime_word_id` INTEGER NOT NULL, `wordVector` TEXT, `expect_positive_evaluation_num` INTEGER NOT NULL, `expect_negative_evaluation_num` INTEGER NOT NULL, `this_user_expect_evaluation` REAL NOT NULL, `this_user_real_evaluation` INTEGER NOT NULL, `evaluation_time` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `app_name` TEXT, `redirecting_url` TEXT, `title` TEXT, `content` TEXT, `cls_intent` TEXT, `imageFile_path` TEXT, `user_id` INTEGER NOT NULL, `arrive_time` INTEGER, `pendingIntent` TEXT, `category` TEXT, `server_id` INTEGER NOT NULL, `first_prime_word_id` INTEGER NOT NULL, `second_prime_word_id` INTEGER NOT NULL, `third_prime_word_id` INTEGER NOT NULL, `fourth_prime_word_id` INTEGER NOT NULL, `wordVector` TEXT, `expect_positive_evaluation_num` INTEGER NOT NULL, `expect_negative_evaluation_num` INTEGER NOT NULL, `this_user_expect_evaluation` REAL NOT NULL, `this_user_real_evaluation` INTEGER NOT NULL, `evaluation_time` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -21,8 +21,8 @@
             "notNull": false
           },
           {
-            "fieldPath": "pakage_name",
-            "columnName": "pakage_name",
+            "fieldPath": "redirecting_url",
+            "columnName": "redirecting_url",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -224,7 +224,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bb0e23972738dc87eea13c783b214fbd')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b8919b064d800fd6e31e1d8d40c26077')"
     ]
   }
 }

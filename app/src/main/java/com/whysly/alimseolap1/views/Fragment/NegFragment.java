@@ -196,14 +196,11 @@ public class NegFragment extends Fragment {
                 int user_eval = 1;
                 final int id = noti_id;
 
-
-                recyclerViewAdapter.removeItemView(noti_position);
-
+                recyclerViewAdapter.removeItemView(noti_position, pref.getString("uid", ""));
                 final Handler handler = new Handler(Looper.getMainLooper());
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-
                         model.updateRealEvaluation(id,1, pref.getString("token",""));
                         //Do something after 100ms
                         System.out.println("981217" + id);
@@ -216,7 +213,7 @@ public class NegFragment extends Fragment {
                 evaluate = "false";
                 int user_eval = -1;
                 //model.updateRealEvaluation(noti_id , -1);
-                recyclerViewAdapter.removeItemView(noti_position);
+                recyclerViewAdapter.removeItemView(noti_position, pref.getString("uid", ""));
                 final int id = noti_id;
 
                 final Handler handler = new Handler(Looper.getMainLooper());
