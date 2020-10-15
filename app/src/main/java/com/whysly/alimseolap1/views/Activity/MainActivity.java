@@ -311,17 +311,17 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
 //                    }
 
 
-                    if (!isPermissionGranted()) {
-                        // 접근 혀용이 되어있지 않다면 1. 메시지 발생 / 2, 설정으로 이동시킴
-                        Toast.makeText(getApplicationContext(), getString(R.string.app_name) + " 앱의 알림 권한을 허용해주세요.", Toast.LENGTH_LONG).show();
-//            WindowManager.LayoutParams windowManagerParams = new WindowManager.LayoutParams(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-//                    WindowManager.LayoutParams.FLAG_FULLSCREEN, PixelFormat.TRANSLUCENT);
-//            wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-//            LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-//            v =  inflater.inflate(R.layout.floating_guide, null);
-                        startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
-//            wm.addView(v, windowManagerParams);
-                    }
+//                    if (!isPermissionGranted()) {
+//                        // 접근 혀용이 되어있지 않다면 1. 메시지 발생 / 2, 설정으로 이동시킴
+//                        Toast.makeText(getApplicationContext(), getString(R.string.app_name) + " 앱의 알림 권한을 허용해주세요.", Toast.LENGTH_LONG).show();
+////            WindowManager.LayoutParams windowManagerParams = new WindowManager.LayoutParams(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+////                    WindowManager.LayoutParams.FLAG_FULLSCREEN, PixelFormat.TRANSLUCENT);
+////            wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+////            LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+////            v =  inflater.inflate(R.layout.floating_guide, null);
+//                        startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+////            wm.addView(v, windowManagerParams);
+//                    }
 
                 }
 

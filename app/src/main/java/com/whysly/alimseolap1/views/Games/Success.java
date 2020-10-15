@@ -19,8 +19,6 @@ public class Success extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.success);
         Button accept = findViewById(R.id.start);
-
-
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

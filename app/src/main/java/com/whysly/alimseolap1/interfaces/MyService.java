@@ -37,8 +37,8 @@ public interface MyService {
     @POST("auth")
     Call<JsonObject> postSignUpSNS(@Body JsonObject jsonObject);
 
-    @POST("messages/{id}")
-    Call<JsonObject> postGameMessageEval(@Header("Authorization") String value, @Path("id") String id, @Body JsonObject jsonObject);
+    @POST("messages")
+    Call<JsonObject> postGameMessageEval(@Header("Authorization") String value, @Body JsonObject jsonObject);
 
 
 

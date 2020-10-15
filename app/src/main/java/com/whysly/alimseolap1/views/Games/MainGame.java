@@ -1,5 +1,6 @@
 package com.whysly.alimseolap1.views.Games;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,16 +16,25 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.whysly.alimseolap1.R;
 import com.whysly.alimseolap1.interfaces.MyService;
+import com.whysly.alimseolap1.models.Game;
 import com.whysly.alimseolap1.models.Message;
 import com.whysly.alimseolap1.models.entities.NotificationEntity;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,14 +51,14 @@ public class MainGame extends AppCompatActivity {
     Context mContext;
     MyService service;
     SharedPreferences pref;
-
-
+    LottieAnimationView lottie;
+    Map<String, Integer> map = new HashMap<>();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game_layout);
         pref = getSharedPreferences("data", MODE_PRIVATE);
-
+        lottie = findViewById(R.id.timer);
         recyclerView = findViewById(R.id.recycler_for_game);
         linearLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, true);
         linearLayoutManager.setReverseLayout(true);
@@ -86,6 +96,29 @@ public class MainGame extends AppCompatActivity {
             }
 
 
+        });
+        lottie.addAnimatorListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                Intent intent = new Intent(MainGame.this, Fail.class);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
         });
 
 
@@ -144,18 +177,46 @@ public class MainGame extends AppCompatActivity {
                 evaluate = false;
             }
 
+            ObjectMapper mapper = new ObjectMapper();
+            Game game = new Game();
 
-            System.out.println(noti_position);
+            map.put(String.valueOf(evaluate), 1);
+            game.setData(map);
+
+            try {
+                mapper.writeValue(new File("game.json"), game);
+                String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(game);
+                Log.d("ㅎㅇ", jsonString);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+//            JSONObject jo1 = new JSONObject();
+//            try {
+//                jo1.put("evaluation", evaluate);
+//                jo1.put("massage_id", recyclerViewAdapter.items.get(noti_position).getItem_id());
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+
+
+//            JSONArray ja = new JSONArray();
+//            ja.put(jo1);
+//            try {
+//                System.out.println("000000"  +ja +ja.getJSONArray(1) +ja.getJSONObject(1));
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+            map.put(String.valueOf(evaluate), recyclerViewAdapter.items.get(noti_position).getItem_id());
+            System.out.println("맵" + map);
             String notitext = "foo";
-
             // 스와이프와 동시에 스와이프 방향과 스와이프된 뷰홀더의 모든 내용을 서버로 전송
-            String notititle = ((TextView) recyclerView.findViewHolderForAdapterPosition(viewHolder.getAdapterPosition()).itemView.findViewById(R.id.notititle)).getText().toString();
-            notitext = ((TextView) recyclerView.findViewHolderForAdapterPosition(viewHolder.getAdapterPosition()).itemView.findViewById(R.id.notitext)).getText().toString();
-//            String noti_sub_text = ((TextView) recyclerView.findViewHolderForAdapterPosition(viewHolder.getAdapterPosition()).itemView.findViewById(R.id.extra_sub_text)).getText().toString();
-            String app_name = ((TextView) recyclerView.findViewHolderForAdapterPosition(viewHolder.getAdapterPosition()).itemView.findViewById(R.id.app_name)).getText().toString();
-//            String package_name = ((TextView) recyclerView.findViewHolderForAdapterPosition(viewHolder.getAdapterPosition()).itemView.findViewById(R.id.packge_name)).getText().toString();
-            System.out.println(app_name);
-            System.out.println(notitext);
+//            String notititle = ((TextView) recyclerView.findViewHolderForAdapterPosition(viewHolder.getAdapterPosition()).itemView.findViewById(R.id.notititle)).getText().toString();
+//            notitext = ((TextView) recyclerView.findViewHolderForAdapterPosition(viewHolder.getAdapterPosition()).itemView.findViewById(R.id.notitext)).getText().toString();
+////            String noti_sub_text = ((TextView) recyclerView.findViewHolderForAdapterPosition(viewHolder.getAdapterPosition()).itemView.findViewById(R.id.extra_sub_text)).getText().toString();
+//            String app_name = ((TextView) recyclerView.findViewHolderForAdapterPosition(viewHolder.getAdapterPosition()).itemView.findViewById(R.id.app_name)).getText().toString();
+////            String package_name = ((TextView) recyclerView.findViewHolderForAdapterPosition(viewHolder.getAdapterPosition()).itemView.findViewById(R.id.packge_name)).getText().toString();
+//            System.out.println(app_name);
+//            System.out.println(notitext);
 
             String noti_date1 = ((TextView) recyclerView.findViewHolderForAdapterPosition(viewHolder.getAdapterPosition()).itemView.findViewById(R.id.noti_date)).getText().toString();
             Log.d("준영", "noti_date1 : " + noti_date1 );
@@ -165,33 +226,67 @@ public class MainGame extends AppCompatActivity {
             System.out.println(noti_position);
 
             //마지막 알림 스와이프 한 경우 성공 메시지
-            if(recyclerViewAdapter.getItemCount() == 0){
-                Intent intent = new Intent(MainGame.this, Success.class);
-                startActivity(intent);
+            if(recyclerViewAdapter.getItemCount() == 1){
+                try {
+                    sendResult();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("evaluation", evaluate);
-            Call<JsonObject> callGME = service.postGameMessageEval(pref.getString("token",""), String.valueOf(recyclerViewAdapter.items.get(noti_position).getItem_id()), jsonObject);
-            callGME.enqueue(new Callback<JsonObject>() {
-                @Override
-                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    Log.d("게임평가전송 완료됨", response.toString());
-                }
-
-                @Override
-                public void onFailure(Call<JsonObject> call, Throwable t) {
-                    Log.d("게임평가전송 실패", t.toString());
-                }
-            });
-
             // 스와이프 하여 제거하면 밑의 코드가 실행되면서 스와이프 된 뷰홀더의 위치 값을 통해 어댑터에서 아이템이 지워졌다고 노티파이 해줌.
             recyclerViewAdapter.removeItem(noti_position);
-
-
         }
     };
 
-    public void sendResult(){
-
+    public static JsonObject getJsonStringFromMap(Map<String, Integer> map ) {
+        JsonObject jsonObject = new JsonObject();
+        for( Map.Entry<String, Integer> entry : map.entrySet() ) {
+            String key = entry.getKey();
+            Integer value = entry.getValue();
+            jsonObject.addProperty(key, value);
+        }
+        return jsonObject;
     }
+
+    public static JSONArray getJsonArrayFromList(List<Map<String, Integer>> list) throws JSONException {
+        JSONArray jsonArray = new JSONArray();
+        for(Map<String, Integer> map:list) {
+            jsonArray.put(getJsonStringFromMap(map));
+        }
+        return jsonArray;
+    }
+
+
+
+
+    public void sendResult() throws JSONException {
+
+        //System.out.println("000000"  +ja +ja.getJSONArray(1) +ja.getJSONObject(1));
+        JsonObject jsonObject = new JsonObject();
+        //JSONObject obj=new JSONObject(map);
+       // JSONArray jsonArray = new JSONArray(map);
+        System.out.println("jsonarray" + getJsonStringFromMap(map));
+        jsonObject.addProperty("data", getJsonStringFromMap(map).getAsString());
+        //JSONArray array=new JSONArray("["+obj.toString()+"]");
+
+        Call<JsonObject> callGME = service.postGameMessageEval(pref.getString("token",""), jsonObject);
+        callGME.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                Log.d("게임평가전송 완료됨", response.toString());
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.d("게임평가전송 실패", t.toString());
+            }
+        });
+
+
+        Intent intent = new Intent(MainGame.this, Success.class);
+        startActivity(intent);
+        finish();
+    }
+
+
 }

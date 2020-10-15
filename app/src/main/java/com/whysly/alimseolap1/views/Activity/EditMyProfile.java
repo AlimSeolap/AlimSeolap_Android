@@ -31,6 +31,7 @@ import com.whysly.alimseolap1.models.Age;
 import com.whysly.alimseolap1.models.City;
 import com.whysly.alimseolap1.models.Province;
 import com.whysly.alimseolap1.models.State;
+import com.whysly.alimseolap1.views.Games.Introduce;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -109,7 +110,7 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
     HashMap<String,String> map1 = new HashMap<String,String>();
     HashMap<String,String> map2 = new HashMap<String,String>();
     String from = "default";
-
+    Intent intent;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,6 +125,8 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
 
         email = findViewById(R.id.editTextEmail);
         nickname = findViewById(R.id.nickname_edit);
+        intent = getIntent();
+        intent.getStringExtra("game");
 
 
 
@@ -263,27 +266,16 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                 Log.d("TEST", data_states.toString());
 
             }
-
             @Override
             public void onFailure(Call<List<State>> call, Throwable t) {
-
-
             }
         });
-
-
-
         //listarea1.add()
-
-
-
         dropDownView = findViewById(R.id.agerange1dropdown);
         dropDownView2 = findViewById(R.id.agerange2dropdown);
         area1 = findViewById(R.id.area1dropdown);
         area2 = findViewById(R.id.area2dropdown);
         area3 = findViewById(R.id.area3dropdown);
-
-
         dropDownView2.setDropDownListItem(yourFilterList2);
         dropDownView.setDropDownListItem(yourFilterList);
         area1.setDropDownListItem(listarea1);
@@ -302,13 +294,9 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                     ageIsSelected = true;
                 }
                 agerange1.setText(dropDownView.getFilterTextView().getText());
-
-
                 //Do something with the selected position
             }
         });
-
-
         dropDownView2.setOnSelectionListener(new OnDropDownSelectionListener() {
             @Override
             public void onItemSelected(DropDownView view, int position) {
@@ -317,12 +305,8 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                 ageIsSelected = true;
                 age_code = map1.get(agerange1.getText().toString());
                 System.out.println(age_code + map1.toString());
-
             }
         });
-
-
-
         area1.setOnSelectionListener(new OnDropDownSelectionListener() {
             @Override
             public void onItemSelected(DropDownView view, int position) {
@@ -355,17 +339,11 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                                 area2.setVisibility(View.VISIBLE);
                                 area2.expand(true);
                     }
-
                     @Override
                     public void onFailure(Call<List<City>> call, Throwable t) {
                         Log.d("TEST", t.getMessage());
                     }
-
-
                 });
-
-
-
                 //Do something with the selected position
             }
         });
@@ -391,7 +369,6 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                             map2.put(data_provinces.get(n).getProvince(), String.valueOf(data_provinces.get(n).getId()));
                             listarea3.add(data_provinces.get(n).getProvince());
                         }
-
                         for (Map.Entry<String, String> entry : map2.entrySet()) {
                             System.out.println("[Key]:" + entry.getKey() + " [Value]:" + entry.getValue());
                         }
@@ -400,22 +377,14 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                         area3.setVisibility(View.VISIBLE);
                         area3.expand(true);
                     }
-
                     @Override
                     public void onFailure(Call<List<Province>> call, Throwable t) {
-
                         Log.d("TEST", t.getMessage());
                     }
-
-
                 });
-
-
-
                 //Do something with the selected position
             }
         });
-
         area3.setOnSelectionListener(new OnDropDownSelectionListener() {
             @Override
             public void onItemSelected(DropDownView view, int position) {
@@ -424,8 +393,6 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                 areaIsSelected = true;
             }
         });
-
-
         malebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -435,7 +402,6 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                 femalebtn.setTextColor(Color.parseColor("#F2B41B"));
             }
         });
-
         femalebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -446,26 +412,15 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
 
             }
         });
-
         ivImage = findViewById(R.id.profile_pic2);
-
         // Glide로 이미지 표시하기
        // String imageUrl = pref.getString("profilepic_path",pref.getString("profilepicurl", ""));
-
             Glide.with(getApplicationContext()).load(pref.getString("profilepic_path",""))
                     .centerCrop()
                     .placeholder(R.drawable.alimi_sample)
                     //.error(R.drawable.alimi_sample)
                     .into(ivImage)
             ;
-
-
-
-
-
-
-
-
     }
 
     public void onEditClick(View view) {
@@ -572,6 +527,11 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
     }
 
     public void complete(){
+        if (this.intent.equals("false")) {
+            Intent intent = new Intent(this, Introduce.class);
+            startActivity(intent);
+            finish();
+        }
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();

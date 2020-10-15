@@ -35,7 +35,7 @@ public class SettingsFragment extends Fragment {
     TextView version_stat;
     Button update_button;
     Button version_check;
-
+    SharedPreferences pref;
 
 
     public void Oncreate(Bundle savedInstanceState) {
@@ -83,7 +83,7 @@ public class SettingsFragment extends Fragment {
         firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         latest_version = firebaseRemoteConfig.getString(LATEST_VERSION_KEY);
         System.out.println("981217" + latest_version);
-        SharedPreferences pref = getContext().getSharedPreferences("data", Activity.MODE_PRIVATE);
+        pref = getContext().getSharedPreferences("data", Activity.MODE_PRIVATE);
         String version = pref.getString("latestVersionInfo", "");
 
         version_check.setOnClickListener(new View.OnClickListener() {
@@ -111,9 +111,9 @@ public class SettingsFragment extends Fragment {
         // Glide로 이미지 표시하기
         Log.d("profilepic_path", pref.getString("profilepic_path",""));
         Glide.with(getContext()).load(pref.getString("profilepic_path",""))
-//                .centerCrop()
-//                .placeholder(R.drawable.alimi_sample)
-//                .error(R.drawable.alimi_sample)
+                .centerCrop()
+                .placeholder(R.drawable.alimi_sample)
+                .error(R.drawable.alimi_sample)
                 .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
                 .into(ivImage)
         ;

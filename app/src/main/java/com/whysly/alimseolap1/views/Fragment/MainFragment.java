@@ -62,7 +62,7 @@ public class MainFragment extends Fragment {
     WebSettings settings;
     final public Handler handler1 = new Handler();
     SharedPreferences pref;
-
+    Retrofit retrofit;
     String pass;
     @Nullable
     @Override
@@ -86,6 +86,7 @@ public class MainFragment extends Fragment {
         settings = webview.getSettings();
         //settings.setLoadsImagesAutomatically(true);
         settings.setJavaScriptEnabled(true);
+
         viewPager = (SmoothNonSwipeableViewPager) view.findViewById(R.id.smoolider);
         manage_widgets_on_swipe(0);
         viewPager.setAdapter( new SmooliderAdapter(activity.getSupportFragmentManager(), 2));
@@ -100,8 +101,8 @@ public class MainFragment extends Fragment {
         LottieAnimationView lottieAnimationView = view.findViewById(R.id.empty_noti);
 
 
-
-        final Retrofit retrofit = new Retrofit.Builder()
+        webview.loadUrl("file:///android_asset/index.html");
+        retrofit = new Retrofit.Builder()
                 .baseUrl("http://172.30.1.18:8000/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -128,13 +129,25 @@ public class MainFragment extends Fragment {
                     }
                 } else  {
                     for (int i = 0; i < 21; i++) {
-                        //sb.append(",\""+ sortedList.get(i).getKeyword() + "\":" + sortedList.get(i).getFinalValueCount());
+                        sb = sb + ",\""+ sortedList.get(i).getKeyword() + "\":" + sortedList.get(i).getFinalValueCount();
                     }
                 }
                 Log.d("워드클라우드 키워드셋", sb.toString());
                 SharedPreferences.Editor editor = pref.edit();
                 editor.putString("wordcloud",  sb.toString().trim());
                 editor.apply();
+                Log.d("저장된 키워드", pref.getString("wordcloud",""));
+                handler1.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        SharedPreferences pref = getContext().getSharedPreferences("data", Context.MODE_PRIVATE);
+                        String defpass = "\"word\":\"freq\",\"알림서랍\":8,\"시각디자인\":8,\"CDO\":12,\"슬기로움\":6,\"안드로이드\":9,\"강민구\":10,\"디자이너\":6";
+                        pass = pref.getString("wordcloud", defpass);
+                        System.out.println("981217" + pass);
+                        System.out.println("981217" + defpass);
+                        webview.loadUrl("javascript:makeWordCloud('{" + pass + "}')");
+                    }
+                });
             }
 
             @Override
@@ -143,20 +156,10 @@ public class MainFragment extends Fragment {
             }
         });
 
-        webview.loadUrl("file:///android_asset/index.html");
 
 
-        handler1.post(new Runnable() {
-            @Override
-            public void run() {
-                SharedPreferences pref = getContext().getSharedPreferences("data", Context.MODE_PRIVATE);
-                String defpass = "\"word\":\"freq\",\"알림서랍\":8,\"시각디자인\":8,\"CDO\":12,\"슬기로움\":6,\"안드로이드\":9,\"강민구\":10,\"디자이너\":6";
-                pass = pref.getString("wordcloud", defpass);
-                System.out.println("981217" + pass);
-                System.out.println("981217" + defpass);
-                webview.loadUrl("javascript:makeWordCloud('{" + pass + "}')");
-            }
-        });
+
+
 
 
        webview.setOnLongClickListener(new View.OnLongClickListener() {
@@ -263,6 +266,43 @@ public class MainFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        MyService service = retrofit.create(MyService.class);
+        pref = getContext().getSharedPreferences("data", Activity.MODE_PRIVATE);
+        Call<List<UserKeyword>> call_user_keyword = service.getUsersKeyword(pref.getString("token", ""));
+        call_user_keyword.enqueue(new Callback<List<UserKeyword>>() {
+            @Override
+            public void onResponse(Call<List<UserKeyword>> call, Response<List<UserKeyword>> response) {
+                List<UserKeyword> keywords = response.body();
+                final Comparator<UserKeyword> comp = (k1, k2) -> Integer.compare( k1.getFinalValueCount(), k2.getFinalValueCount());
+                List<UserKeyword> sortedList = keywords.stream()
+                        .sorted(comp)
+                        .collect(Collectors.toList());
+                //StringBuilder sb = new StringBuilder("\"word\":\"freq\"");
+                String sb = "\"word\":\"freq\"";
+                //StringBuilder sb = new StringBuilder();
+                if(keywords == null){
+
+                } else if(keywords.size() < 20) {
+                    for (int i = 0; i < keywords.size(); i++) {
+                        //sb.append(",\""+ sortedList.get(i).getKeyword() + "\":" + 8);
+                        sb = sb + ",\""+ sortedList.get(i).getKeyword() + "\":" + 8;
+                    }
+                } else  {
+                    for (int i = 0; i < 21; i++) {
+                        sb = sb + ",\""+ sortedList.get(i).getKeyword() + "\":" + sortedList.get(i).getFinalValueCount();
+                    }
+                }
+                Log.d("워드클라우드 키워드셋", sb.toString());
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putString("wordcloud",  sb.toString().trim());
+                editor.apply();
+            }
+
+            @Override
+            public void onFailure(Call<List<UserKeyword>> call, Throwable t) {
+
+            }
+        });
 
 
         handler1.post(new Runnable() {
@@ -270,7 +310,6 @@ public class MainFragment extends Fragment {
             public void run() {
                 SharedPreferences pref = getContext().getSharedPreferences("data", Context.MODE_PRIVATE);
                 String defpass = "\"word\":\"freq\",\"알림서랍\":8,\"시각디자인\":8,\"CDO\":12,\"슬기로움\":6,\"안드로이드\":9,\"강민구\":10,\"디자이너\":6";
-                pass = pref.getString("wordcloud", defpass);
                 System.out.println("981217" + pass);
                 webview.loadUrl("javascript:makeWordCloud('{" + pass + "}')");
 

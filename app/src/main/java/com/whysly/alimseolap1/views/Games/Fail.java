@@ -20,7 +20,6 @@ public class Fail extends AppCompatActivity {
         setContentView(R.layout.fail);
         Button accept = findViewById(R.id.start2);
 
-
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

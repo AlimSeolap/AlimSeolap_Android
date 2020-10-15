@@ -428,11 +428,12 @@ public class LoginActivity extends AppCompatActivity   {
                     editor.putString("email", object.getString("email"));
                      name = object.getString("nickname");
                      what = String.valueOf(object.getInt("age_id"));
-                    if (object.getString("profile_img") != null) {
-                        editor.putString("profilepic_path", object.getString("profile_img"));
-                    } else {
-                        editor.putString("profilepic_path", LoginMethod.getProfilePicUrl());
-                    }
+//                    if (object.getString("profile_img") != null) {
+//                        editor.putString("profilepic_path", object.getString("profile_img"));
+//                    } else {
+//                        editor.putString("profilepic_path", LoginMethod.getProfilePicUrl());
+//                    }
+                    editor.putString("profilepic_path", LoginMethod.getProfilePicUrl());
                     editor.putString("uid", object.getString("id"));
                     editor.apply();
                 } catch (JSONException e) {
@@ -447,6 +448,7 @@ public class LoginActivity extends AppCompatActivity   {
                 if(what.equals("1")) {
                     Intent intent = new Intent(context, EditMyProfile.class);
                     intent.putExtra("from", "login");
+                    intent.putExtra("game", "false");
                     startActivity(intent);
                 } else {
                     String welcome = getString(R.string.welcome) + name;
