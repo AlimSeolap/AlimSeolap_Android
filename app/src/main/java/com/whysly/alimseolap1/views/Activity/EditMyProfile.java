@@ -159,6 +159,14 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
         String email_text = intent.getStringExtra("email");
         String password = intent.getStringExtra("password");
         from = intent.getStringExtra("from");
+        ivImage = findViewById(R.id.profile_pic2);
+        // Glide로 이미지 표시하기
+        // String imageUrl = pref.getString("profilepic_path",pref.getString("profilepicurl", ""));
+        Glide.with(getApplicationContext()).load(pref.getString("profilepic_path",""))
+                .centerCrop()
+                //.placeholder(R.drawable.alimi_sample)
+                .error(R.drawable.alimi_sample)
+                .into(ivImage);
 
         if (from.equals("signup")) {
             this.email.setText(email_text);
@@ -194,11 +202,13 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                         area_name_2.setText(area.getString("city"));
                         area_name_3.setText(area.getString("province"));
                         agerange1.setText(age);
+                        Log.d("나이", age);
                         SharedPreferences.Editor editor = pref.edit();
                         if (object.getString("profile_img") != null) {
-                            editor.putString("profilepic_path", object.getString("profile_img"));
+                            editor.putString("profilepic_path", "https://" + object.getString("profile_img").substring(10));
                             editor.apply();
                             Log.d("파일경로", pref.getString("profilepic_path", ""));
+
                         }
                         if(gen.equals("M")){
                             malebtn.setSelected(true);
@@ -412,15 +422,15 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
 
             }
         });
-        ivImage = findViewById(R.id.profile_pic2);
-        // Glide로 이미지 표시하기
-       // String imageUrl = pref.getString("profilepic_path",pref.getString("profilepicurl", ""));
-            Glide.with(getApplicationContext()).load(pref.getString("profilepic_path",""))
-                    .centerCrop()
-                    .placeholder(R.drawable.alimi_sample)
-                    //.error(R.drawable.alimi_sample)
-                    .into(ivImage)
-            ;
+//        ivImage = findViewById(R.id.profile_pic2);
+//        // Glide로 이미지 표시하기
+//       // String imageUrl = pref.getString("profilepic_path",pref.getString("profilepicurl", ""));
+//            Glide.with(getApplicationContext()).load(pref.getString("profilepic_path",""))
+//                    .centerCrop()
+//                    .placeholder(R.drawable.alimi_sample)
+//                    //.error(R.drawable.alimi_sample)
+//                    .into(ivImage)
+//            ;
     }
 
     public void onEditClick(View view) {
@@ -503,14 +513,13 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
             map.put("age", age);
             map.put("area", area);
             map.put("gender", gender);
-            //map.put("password", password);
+            map.put("password", password);
 
             //@Part MultipartBody.Part filePart
             Call<ResponseBody> call_patchMe = service.patchMe(pref.getString("token", ""), map, profile_img);
             call_patchMe.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    response.code();
                     editor.remove("new_profilepic_path");
                     editor.apply();
                     complete();
@@ -552,45 +561,6 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
 
 
     public void onPicClick() {
-
-
-//        if(v.getId() == R.id.btn_signupfinish) {
-//
-//            /** SharedPreference 환경 변수 사용 **/
-//
-//            SharedPreferences prefs = getSharedPreferences("login", 0);
-//
-//            /** prefs.getString() return값이 null이라면 2번째 함수를 대입한다. **/
-//
-//            String login = prefs.getString("USER_LOGIN", "LOGOUT");
-//
-//            String facebook_login = prefs.getString("FACEBOOK_LOGIN", "LOGOUT");
-//
-//            String user_id = prefs.getString("USER_ID","");
-//
-//            String user_name = prefs.getString("USER_NAME", "");
-//
-//            String user_password = prefs.getString("USER_PASSWORD", "");
-//
-//            String user_phone = prefs.getString("USER_PHONE", "");
-//
-//            String user_email = prefs.getString("USER_EMAIL", "");
-//
-//            dbmanger.select(user_id,user_name,user_password, user_phone, user_email);
-//
-//            dbmanger.selectPhoto(user_name, mImageCaptureUri, absoultePath);
-//
-//
-//            Intent mainIntent = new Intent(SignUpPhotoActivity.this, LoginActivity.class);
-//
-//            SignUpPhotoActivity.this.startActivity(mainIntent);
-//
-//            SignUpPhotoActivity.this.finish();
-//
-//            Toast.makeText(this, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show();
-//
-//
-//        }else
 
 
             DialogInterface.OnClickListener cameraListener = new DialogInterface.OnClickListener() {

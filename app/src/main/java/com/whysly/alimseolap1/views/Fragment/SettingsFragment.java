@@ -112,8 +112,8 @@ public class SettingsFragment extends Fragment {
         Log.d("profilepic_path", pref.getString("profilepic_path",""));
         Glide.with(getContext()).load(pref.getString("profilepic_path",""))
                 .centerCrop()
-                .placeholder(R.drawable.alimi_sample)
-                .error(R.drawable.alimi_sample)
+                //.placeholder(R.drawable.alimi_sample)
+                //.error(R.drawable.alimi_sample)
                 .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
                 .into(ivImage)
         ;

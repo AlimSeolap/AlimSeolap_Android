@@ -102,11 +102,9 @@ public class Introduce extends AppCompatActivity {
             public void run()
 
             {
-
                 c1.startAnimation(animation4);
                 c1.setVisibility(View.VISIBLE);
                 //여기에 딜레이 후 시작할 작업들을 입력
-
             }
         }, 4500);// 0.5초 정도 딜레이를 준 후 시작
 
@@ -114,16 +112,12 @@ public class Introduce extends AppCompatActivity {
         {
             @Override
             public void run()
-
             {
-
                 c2.startAnimation(animation5);
                 c3.startAnimation(animation5);
                 c2.setVisibility(View.VISIBLE);
                 c3.setVisibility(View.VISIBLE);
-
                 //여기에 딜레이 후 시작할 작업들을 입력
-
             }
         }, 6000);// 0.5초 정도 딜레이를 준 후 시작
 
