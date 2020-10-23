@@ -17,21 +17,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.whysly.alimseolap1.R;
 import com.whysly.alimseolap1.interfaces.MyService;
-import com.whysly.alimseolap1.models.Game;
 import com.whysly.alimseolap1.models.Message;
 import com.whysly.alimseolap1.models.entities.NotificationEntity;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +48,9 @@ public class MainGame extends AppCompatActivity {
     MyService service;
     SharedPreferences pref;
     LottieAnimationView lottie;
-    Map<String, Integer> map = new HashMap<>();
+    HashMap<Integer, Boolean> map = new HashMap<>();
+
+    JsonArray array = new JsonArray();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,9 +92,8 @@ public class MainGame extends AppCompatActivity {
                 Log.d("게임알림에러", t.getMessage());
                 Toast.makeText(getApplicationContext(), "게임용 알림데이터를 가져오지 못하였습니다.", Toast.LENGTH_LONG).show();
             }
-
-
         });
+
         lottie.addAnimatorListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
@@ -177,19 +174,12 @@ public class MainGame extends AppCompatActivity {
                 evaluate = false;
             }
 
-            ObjectMapper mapper = new ObjectMapper();
-            Game game = new Game();
+//            ObjectMapper mapper = new ObjectMapper();
+//            Game game = new Game();
 
-            map.put(String.valueOf(evaluate), 1);
-            game.setData(map);
+//            map.put(String.valueOf(evaluate), 1);
+//            game.setData(map);
 
-            try {
-                mapper.writeValue(new File("game.json"), game);
-                String jsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(game);
-                Log.d("ㅎㅇ", jsonString);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
 //            JSONObject jo1 = new JSONObject();
 //            try {
 //                jo1.put("evaluation", evaluate);
@@ -206,7 +196,15 @@ public class MainGame extends AppCompatActivity {
 //            } catch (JSONException e) {
 //                e.printStackTrace();
 //            }
-            map.put(String.valueOf(evaluate), recyclerViewAdapter.items.get(noti_position).getItem_id());
+            map.put(recyclerViewAdapter.items.get(noti_position).getItem_id(), evaluate);
+
+
+            Map.Entry<Integer,Boolean> entry;
+            JsonObject obj = new JsonObject();
+            obj.addProperty("evaluation", evaluate);
+            obj.addProperty("message_id", recyclerViewAdapter.items.get(noti_position).getItem_id());
+            array.add(obj);
+
             System.out.println("맵" + map);
             String notitext = "foo";
             // 스와이프와 동시에 스와이프 방향과 스와이프된 뷰홀더의 모든 내용을 서버로 전송
@@ -218,17 +216,13 @@ public class MainGame extends AppCompatActivity {
 //            System.out.println(app_name);
 //            System.out.println(notitext);
 
-            String noti_date1 = ((TextView) recyclerView.findViewHolderForAdapterPosition(viewHolder.getAdapterPosition()).itemView.findViewById(R.id.noti_date)).getText().toString();
-            Log.d("준영", "noti_date1 : " + noti_date1 );
-            Date time = new Date();
-            SimpleDateFormat format1 = new SimpleDateFormat ( "yyyy-MM-dd HH:mm:ss");
-            String noti_date2 = format1.format(time);
-            System.out.println(noti_position);
+
 
             //마지막 알림 스와이프 한 경우 성공 메시지
             if(recyclerViewAdapter.getItemCount() == 1){
                 try {
-                    sendResult();
+
+                    sendResult(array);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -238,55 +232,24 @@ public class MainGame extends AppCompatActivity {
         }
     };
 
-    public static JsonObject getJsonStringFromMap(Map<String, Integer> map ) {
+    public void sendResult(JsonArray array) throws JSONException {
         JsonObject jsonObject = new JsonObject();
-        for( Map.Entry<String, Integer> entry : map.entrySet() ) {
-            String key = entry.getKey();
-            Integer value = entry.getValue();
-            jsonObject.addProperty(key, value);
-        }
-        return jsonObject;
-    }
-
-    public static JSONArray getJsonArrayFromList(List<Map<String, Integer>> list) throws JSONException {
-        JSONArray jsonArray = new JSONArray();
-        for(Map<String, Integer> map:list) {
-            jsonArray.put(getJsonStringFromMap(map));
-        }
-        return jsonArray;
-    }
-
-
-
-
-    public void sendResult() throws JSONException {
-
-        //System.out.println("000000"  +ja +ja.getJSONArray(1) +ja.getJSONObject(1));
-        JsonObject jsonObject = new JsonObject();
-        //JSONObject obj=new JSONObject(map);
-       // JSONArray jsonArray = new JSONArray(map);
-        System.out.println("jsonarray" + getJsonStringFromMap(map));
-        jsonObject.addProperty("data", getJsonStringFromMap(map).getAsString());
-        //JSONArray array=new JSONArray("["+obj.toString()+"]");
-
-        Call<JsonObject> callGME = service.postGameMessageEval(pref.getString("token",""), jsonObject);
-        callGME.enqueue(new Callback<JsonObject>() {
+        jsonObject.add("data", array);
+        Log.d("게임평가", jsonObject.toString());
+        Call<JsonElement> callGME = service.postGameMessageEval(pref.getString("token",""), jsonObject);
+        callGME.enqueue(new Callback<JsonElement>() {
             @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 Log.d("게임평가전송 완료됨", response.toString());
             }
 
             @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
+            public void onFailure(Call<JsonElement> call, Throwable t) {
                 Log.d("게임평가전송 실패", t.toString());
             }
         });
-
-
         Intent intent = new Intent(MainGame.this, Success.class);
         startActivity(intent);
         finish();
     }
-
-
 }

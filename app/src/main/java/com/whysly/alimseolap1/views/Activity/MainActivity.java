@@ -111,7 +111,7 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
 
             @Override
             protected void onCreate(Bundle savedInstanceState) {
-
+                setContentView(R.layout.activity_main);
                 bp = new BackPressedForFinish(this);
                 super.onCreate(savedInstanceState);
                 pref = getSharedPreferences("data", Activity.MODE_PRIVATE);
@@ -122,18 +122,13 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
                     finish();
                 }
                 else {
-
-
                     SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-
                     NotificationDatabase db = NotificationDatabase.getNotificationDatabase(getApplicationContext(), pref.getString("uid",""));
                     final Retrofit retrofit = new Retrofit.Builder()
                             .baseUrl("http://172.30.1.18:8000/")
                             .addConverterFactory(GsonConverterFactory.create())
                             .build();
                     MyService service = retrofit.create(MyService.class);
-
                     Call<List<Message>> call_user_message = service.getUserMessages(pref.getString("token", ""));
                     call_user_message.enqueue(new Callback<List<Message>>() {
                         @Override
@@ -204,40 +199,6 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
                     AccessToken accessToken = AccessToken.getCurrentAccessToken();
 
 
-                    // 이미 구글 파이어베이스 로그인 되어있을 경우
-//        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//        if (user != null) {
-//            LoginMethod.setLoginMethod("google");
-//
-//        }
-//
-//         //이미 네이버 로그인 되어있을 경우
-//        else if (OAuthLogin.getInstance().getState(getApplicationContext()) == OAuthLoginState.OK) {
-//            LoginMethod.setLoginMethod("naver");
-//
-//            if (OAuthLogin.getInstance().getState(getApplicationContext()) == OAuthLoginState.NEED_REFRESH_TOKEN) {
-//                OAuthLogin.getInstance().refreshAccessToken(getApplicationContext());
-//            }
-//        }
-//
-//        else if ( Session.getCurrentSession().isOpened()) {
-//            LoginMethod.setLoginMethod("kakao");
-//        }
-//
-//        else if (accessToken != null && !accessToken.isExpired()) {
-//            LoginMethod.setLoginMethod("facebook");
-//        }
-//
-//        else {
-//            Intent loginIntent = new Intent(this, LoginActivity.class);
-//            startActivity(loginIntent);
-//        }
-
-//        CsvTry csvTry = new CsvTry(getApplicationContext());
-                    //csvTry.generateCsvFile();
-
-
-                    setContentView(R.layout.activity_main);
 
                     StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
                     StrictMode.setVmPolicy(builder.build());

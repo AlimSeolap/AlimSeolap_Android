@@ -433,7 +433,11 @@ public class LoginActivity extends AppCompatActivity   {
 //                    } else {
 //                        editor.putString("profilepic_path", LoginMethod.getProfilePicUrl());
 //                    }
-                    editor.putString("profilepic_path", "https://" + object.getString("profile_img").substring(10));
+                    if(object.getString("profile_img").length() > 10) {
+                        editor.putString("profilepic_path", "https://" + object.getString("profile_img").substring(10));
+                    } else {
+                        editor.putString("profilepic_path", LoginMethod.getProfilePicUrl());
+                    }
                     editor.putString("uid", object.getString("id"));
                     editor.apply();
                 } catch (JSONException e) {

@@ -1,11 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<ScrollView
+<FrameLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/loading_dots"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:background="@color/transparent"
+        app:lottie_autoPlay="true"
+        app:lottie_rawRes="@raw/loading"
+        app:lottie_loop="true"
+        android:elevation="1dp"
+        app:lottie_repeatMode="restart"
+        android:visibility="visible"/>
+
+
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
 
 <LinearLayout
 
@@ -486,6 +505,9 @@
 
 
 
+
 </LinearLayout>
 
+
 </ScrollView>
+</FrameLayout>

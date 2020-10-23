@@ -9,9 +9,11 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,6 +22,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.asksira.dropdownview.DropDownView;
 import com.asksira.dropdownview.OnDropDownSelectionListener;
 import com.bumptech.glide.Glide;
@@ -89,6 +92,7 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
     Boolean ageIsSelected = false;
     Boolean areaIsSelected = false;
     Boolean gameReady = false;
+    LottieAnimationView loading_dots;
     private static final String CAPTURE_PATH = "/Profile_Alimi";
     private static final int PICK_FROM_CAMERA = 0;
 
@@ -122,6 +126,8 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
         area_name_1 = findViewById(R.id.area1);
         area_name_2 = findViewById(R.id.area2);
         area_name_3 = findViewById(R.id.area3);
+        loading_dots = findViewById(R.id.loading_dots);
+        loading_dots.setVisibility(View.INVISIBLE);
 
         email = findViewById(R.id.editTextEmail);
         nickname = findViewById(R.id.nickname_edit);
@@ -204,7 +210,7 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                         agerange1.setText(age);
                         Log.d("나이", age);
                         SharedPreferences.Editor editor = pref.edit();
-                        if (object.getString("profile_img") != null) {
+                        if (object.getString("profile_img").length() > 10) {
                             editor.putString("profilepic_path", "https://" + object.getString("profile_img").substring(10));
                             editor.apply();
                             Log.d("파일경로", pref.getString("profilepic_path", ""));
@@ -443,6 +449,9 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                         || email.getVisibility() != view.VISIBLE || nickname.getVisibility() != view.VISIBLE)
                 {
                 }
+                loading_dots.setVisibility(View.VISIBLE);
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                 saveAllandPatch();
 
                 //Toast.makeText(this, "모든 정보를 입력해 주세요", Toast.LENGTH_SHORT).show();
@@ -495,7 +504,6 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
 //            age_code.get(agerange1 +" "+ agerange2).toString()
             RequestBody age = RequestBody.create(MediaType.parse("text/plain"), age_code);
             RequestBody area = RequestBody.create(MediaType.parse("text/plain"), area_code);
-
             //RequestBody profile_img = RequestBody.create(MediaType.parse("multipart/form-data"),file);
             RequestBody password = RequestBody.create(MediaType.parse("text/plain"),
                     this.nickname.getText().toString());
@@ -507,14 +515,12 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
             if(pref.getString("new_profilepic_path", "").equals("")){
                 profile_img = null;
             }
-
             Map<String, RequestBody> map = new HashMap<>();
             map.put("nickname", nickname);
             map.put("age", age);
             map.put("area", area);
             map.put("gender", gender);
             map.put("password", password);
-
             //@Part MultipartBody.Part filePart
             Call<ResponseBody> call_patchMe = service.patchMe(pref.getString("token", ""), map, profile_img);
             call_patchMe.enqueue(new Callback<ResponseBody>() {
@@ -536,15 +542,23 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
     }
 
     public void complete(){
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loading_dots.setVisibility(View.INVISIBLE);
+
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+                finish();
+                Toast.makeText(getApplicationContext(), "정보가 저장되었습니다", Toast.LENGTH_SHORT).show();
+            }
+        }, 2000);
         if (this.intent.equals("false")) {
             Intent intent = new Intent(this, Introduce.class);
             startActivity(intent);
             finish();
         }
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        finish();
-        Toast.makeText(this, "정보가 저장되었습니다", Toast.LENGTH_SHORT).show();
     }
 
     public void game(){

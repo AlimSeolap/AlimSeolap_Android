@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,6 +27,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.whysly.alimseolap1.R;
+import com.whysly.alimseolap1.Util.Z_value;
 import com.whysly.alimseolap1.interfaces.MyService;
 import com.whysly.alimseolap1.models.UserKeyword;
 import com.whysly.alimseolap1.views.Activity.MainActivity;
@@ -37,6 +39,7 @@ import com.whysly.alimseolap1.views.Adapters.SmooliderAdapter;
 import com.whysly.alimseolap1.views.SmoothNonSwipeableViewPager;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -113,7 +116,19 @@ public class MainFragment extends Fragment {
             @Override
             public void onResponse(Call<List<UserKeyword>> call, Response<List<UserKeyword>> response) {
                 List<UserKeyword> keywords = response.body();
-                final Comparator<UserKeyword> comp = (k1, k2) -> Integer.compare( k1.getFinalValueCount(), k2.getFinalValueCount());
+                HashMap<String, Integer> map = new HashMap<>();
+                System.out.println("아나" + keywords.get(1).getPositive_value_count());
+                //positive z-score 구하기
+                for (int i = 0 ; i < keywords.size() ; i++){
+                    map.put(keywords.get(i).getKeyword(), keywords.get(i).getPositive_value_count());
+                    System.out.println(keywords.get(i).getPositive_value_count());
+                }
+                Z_value one = new Z_value();
+                HashMap<String, Double> z_value = one.getZ_value(map);
+                Toast myToast = Toast.makeText(getContext(), z_value.toString(), Toast.LENGTH_SHORT);
+
+                myToast.show();
+                final Comparator<UserKeyword> comp = (k1, k2) -> Integer.compare( k1.getFinal_value_count(), k2.getFinal_value_count());
                 List<UserKeyword> sortedList = keywords.stream()
                         .sorted(comp)
                         .collect(Collectors.toList());
@@ -121,7 +136,6 @@ public class MainFragment extends Fragment {
                 String sb = "\"word\":\"freq\"";
                 //StringBuilder sb = new StringBuilder();
                 if(keywords == null){
-
                 } else if(keywords.size() < 20) {
                     for (int i = 0; i < keywords.size(); i++) {
                         //sb.append(",\""+ sortedList.get(i).getKeyword() + "\":" + 8);
@@ -129,7 +143,7 @@ public class MainFragment extends Fragment {
                     }
                 } else  {
                     for (int i = 0; i < 21; i++) {
-                        sb = sb + ",\""+ sortedList.get(i).getKeyword() + "\":" + sortedList.get(i).getFinalValueCount();
+                        sb = sb + ",\""+ sortedList.get(i).getKeyword() + "\":" + sortedList.get(i).getFinal_value_count();
                     }
                 }
                 Log.d("워드클라우드 키워드셋", sb.toString());
@@ -273,7 +287,7 @@ public class MainFragment extends Fragment {
             @Override
             public void onResponse(Call<List<UserKeyword>> call, Response<List<UserKeyword>> response) {
                 List<UserKeyword> keywords = response.body();
-                final Comparator<UserKeyword> comp = (k1, k2) -> Integer.compare( k1.getFinalValueCount(), k2.getFinalValueCount());
+                final Comparator<UserKeyword> comp = (k1, k2) -> Integer.compare( k1.getFinal_value_count(), k2.getFinal_value_count());
                 List<UserKeyword> sortedList = keywords.stream()
                         .sorted(comp)
                         .collect(Collectors.toList());
@@ -289,7 +303,7 @@ public class MainFragment extends Fragment {
                     }
                 } else  {
                     for (int i = 0; i < 21; i++) {
-                        sb = sb + ",\""+ sortedList.get(i).getKeyword() + "\":" + sortedList.get(i).getFinalValueCount();
+                        sb = sb + ",\""+ sortedList.get(i).getKeyword() + "\":" + sortedList.get(i).getFinal_value_count();
                     }
                 }
                 Log.d("워드클라우드 키워드셋", sb.toString());

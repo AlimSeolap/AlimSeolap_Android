@@ -7,9 +7,9 @@ public class UserKeyword {
 
 private int id;
 private String keyword;
-private int positiveValueCount;
-private int negativeValueCount;
-private int finalValueCount;
+private int positive_value_count;
+private int negative_value_count;
+private int final_value_count;
 private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 public int getId() {
@@ -28,28 +28,28 @@ public void setKeyword(String keyword) {
 this.keyword = keyword;
 }
 
-public int getPositiveValueCount() {
-return positiveValueCount;
+public int getPositive_value_count() {
+return positive_value_count;
 }
 
-public void setPositiveValueCount(int positiveValueCount) {
-this.positiveValueCount = positiveValueCount;
+public void setPositive_value_count(int positive_value_count) {
+this.positive_value_count = positive_value_count;
 }
 
-public int getNegativeValueCount() {
-return negativeValueCount;
+public int getNegative_value_count() {
+return negative_value_count;
 }
 
-public void setNegativeValueCount(int negativeValueCount) {
-this.negativeValueCount = negativeValueCount;
+public void setNegative_value_count(int negative_value_count) {
+this.negative_value_count = negative_value_count;
 }
 
-public int getFinalValueCount() {
-return finalValueCount;
+public int getFinal_value_count() {
+return final_value_count;
 }
 
-public void setFinalValueCount(int finalValueCount) {
-this.finalValueCount = finalValueCount;
+public void setFinal_value_count(int final_value_count) {
+this.final_value_count = final_value_count;
 }
 
 public Map<String, Object> getAdditionalProperties() {

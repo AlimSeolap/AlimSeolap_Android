@@ -1,5 +1,6 @@
 package com.whysly.alimseolap1.interfaces;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.whysly.alimseolap1.models.Age;
 import com.whysly.alimseolap1.models.City;
@@ -38,7 +39,7 @@ public interface MyService {
     Call<JsonObject> postSignUpSNS(@Body JsonObject jsonObject);
 
     @POST("messages")
-    Call<JsonObject> postGameMessageEval(@Header("Authorization") String value, @Body JsonObject jsonObject);
+    Call<JsonElement> postGameMessageEval(@Header("Authorization") String value, @Body JsonObject jsonObject);
 
 
 
