@@ -10,6 +10,8 @@ private String keyword;
 private int positive_value_count;
 private int negative_value_count;
 private int final_value_count;
+private double p_value;
+private double n_value;
 private double z_value;
 private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -44,6 +46,22 @@ public double getZ_value() {
 public void setZ_value(double z_value) {
     this.z_value = z_value;
 }
+
+    public double getN_value() {
+        return n_value;
+    }
+
+    public double getP_value() {
+        return p_value;
+    }
+
+    public void setN_value(double n_value) {
+        this.n_value = n_value;
+    }
+
+    public void setP_value(double p_value) {
+        this.p_value = p_value;
+    }
 
     public int getNegative_value_count() {
 return negative_value_count;

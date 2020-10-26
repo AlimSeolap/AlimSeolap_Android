@@ -117,18 +117,29 @@ public class MainFragment extends Fragment {
             public void onResponse(Call<List<UserKeyword>> call, Response<List<UserKeyword>> response) {
                 List<UserKeyword> keywords = response.body();
                 HashMap<String, Integer> map = new HashMap<>();
+                HashMap<String, Integer> map2 = new HashMap<>();
                 //positive z-score 구하기
                 for (int i = 0 ; i < keywords.size() ; i++){
                     map.put(keywords.get(i).getKeyword(), keywords.get(i).getPositive_value_count());
                     System.out.println(keywords.get(i).getPositive_value_count());
                 }
-                Z_value one = new Z_value();
-                HashMap<String, Double> z_value = one.getZ_score(map);
+
                 for (int i = 0 ; i < keywords.size() ; i++){
-                    keywords.get(i).setZ_value(z_value.get(keywords.get(i).getKeyword()));
+                    map2.put(keywords.get(i).getKeyword(), keywords.get(i).getNegative_value_count());
+                    System.out.println(keywords.get(i).getNegative_value_count());
+                }
+
+
+                Z_value one = new Z_value();
+                HashMap<String, Double> p_value = one.getZ_score(map);
+                HashMap<String, Double> n_value = one.getZ_score(map2);
+
+
+                for (int i = 0 ; i < keywords.size() ; i++){
+                    keywords.get(i).setZ_value(p_value.get(keywords.get(i).getKeyword()) - n_value.get(keywords.get(i).getKeyword()));
                     System.out.println("z_value for" + keywords.get(i).getKeyword() + ": " + keywords.get(i).getZ_value());
                 }
-                Toast myToast = Toast.makeText(getContext(), z_value.toString(), Toast.LENGTH_SHORT);
+                Toast myToast = Toast.makeText(getContext(), p_value.toString(), Toast.LENGTH_SHORT);
 
                 myToast.show();
                 final Comparator<UserKeyword> comp = (k1, k2) -> Double.compare( k1.getZ_value(), k2.getZ_value());
@@ -146,7 +157,7 @@ public class MainFragment extends Fragment {
                         System.out.println("sorted list is: " + sortedList.get(i).getZ_value());
                     }
                 } else  {
-                    for (int i = 0; i < 21; i++) {
+                    for (int i = 0; i < 20; i++) {
                         sb = sb + ",\""+ sortedList.get(i).getKeyword() + "\":" + sortedList.get(i).getFinal_value_count();
                     }
                 }
@@ -292,45 +303,55 @@ public class MainFragment extends Fragment {
             public void onResponse(Call<List<UserKeyword>> call, Response<List<UserKeyword>> response) {
                 List<UserKeyword> keywords = response.body();
                 HashMap<String, Integer> map = new HashMap<>();
+                HashMap<String, Integer> map2 = new HashMap<>();
                 //positive z-score 구하기
                 for (int i = 0 ; i < keywords.size() ; i++){
                     map.put(keywords.get(i).getKeyword(), keywords.get(i).getPositive_value_count());
                     System.out.println(keywords.get(i).getPositive_value_count());
                 }
-                //z_score 구하기
-                Z_value one = new Z_value();
-                HashMap<String, Double> z_value = one.getZ_score(map);
+
                 for (int i = 0 ; i < keywords.size() ; i++){
-                    keywords.get(i).setZ_value(z_value.get(keywords.get(i).getKeyword()));
+                    map2.put(keywords.get(i).getKeyword(), keywords.get(i).getNegative_value_count());
+                    System.out.println(keywords.get(i).getNegative_value_count());
+                }
+
+
+                Z_value one = new Z_value();
+                HashMap<String, Double> p_value = one.getZ_score(map);
+                HashMap<String, Double> n_value = one.getZ_score(map2);
+
+
+                for (int i = 0 ; i < keywords.size() ; i++){
+                    keywords.get(i).setZ_value(p_value.get(keywords.get(i).getKeyword()) - n_value.get(keywords.get(i).getKeyword()));
                     System.out.println("z_value for" + keywords.get(i).getKeyword() + ": " + keywords.get(i).getZ_value());
                 }
-                Toast myToast = Toast.makeText(getContext(), z_value.toString(), Toast.LENGTH_SHORT);
+                Toast myToast = Toast.makeText(getContext(), n_value.toString(), Toast.LENGTH_SHORT);
 
                 myToast.show();
-                final Comparator<UserKeyword> comp = (k1, k2) -> Double.compare( k1.getZ_value(), k2.getZ_value());
+                final Comparator<UserKeyword> comp = (k1, k2) -> Double.compare(k1.getZ_value(), k2.getZ_value());
                 List<UserKeyword> sortedList = keywords.stream()
                         .sorted(comp)
                         .collect(Collectors.toList());
                 double a= sortedList.get(0).getZ_value();
                 double b= sortedList.get(sortedList.size() - 1).getZ_value() - sortedList.get(0).getZ_value()  ;
-                for (i = 0; i < sortedList.size(); i++){
+                for (int i = 0; i < sortedList.size(); i++){
                     double c = sortedList.get(i).getZ_value();
-                    int d= (int)Math.round((c - a)*(10/b) +1);
+                    int d= (int)Math.round((c - a)*(5/b) +1);
                     sortedList.get(i).setZ_value(d);
                 }
                 String sb = "\"word\":\"freq\"";
 
 
                 if(keywords == null){
-                } else if(keywords.size() < 20) {
+                } else if(keywords.size() < 21) {
                     for (int i = 0; i < keywords.size(); i++) {
                         //sb.append(",\""+ sortedList.get(i).getKeyword() + "\":" + 8);
-                        sb = sb + ",\""+ sortedList.get(i).getKeyword() + "\":" + (int)sortedList.get(i).getZ_value();
+                        sb = sb + ",\""+ sortedList.get(i).getKeyword() + "\":" + ((int)sortedList.get(i).getZ_value()*2);
                         System.out.println("sorted list is: " + sortedList.get(i).getZ_value());
                     }
                 } else  {
                     for (int i = 0; i < 21; i++) {
-                        sb = sb + ",\""+ sortedList.get(i).getKeyword() + "\":" + sortedList.get(i).getFinal_value_count();
+                        sb = sb + ",\""+ sortedList.get(i).getKeyword() + "\":" + ((int)sortedList.get(i).getZ_value()*2);
                     }
                 }
                 Log.d("워드클라우드 키워드셋", sb.toString());
@@ -361,9 +382,10 @@ public class MainFragment extends Fragment {
 
     }
 
-    int i = 0;
 
+    int i = 0;
     public void onLottieClick(View view) {
+
         if( i == 0 ) {
             animationView.setSpeed((float) 1.5);
             animationView.playAnimation();

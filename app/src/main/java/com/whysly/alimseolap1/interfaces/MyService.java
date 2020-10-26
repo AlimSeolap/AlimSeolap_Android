@@ -7,6 +7,7 @@ import com.whysly.alimseolap1.models.City;
 import com.whysly.alimseolap1.models.Message;
 import com.whysly.alimseolap1.models.Province;
 import com.whysly.alimseolap1.models.State;
+import com.whysly.alimseolap1.models.User;
 import com.whysly.alimseolap1.models.UserKeyword;
 
 import java.util.List;
@@ -77,7 +78,7 @@ public interface MyService {
 
     @Multipart
     @PATCH("me")
-    Call<JsonObject> patchMe(@Header("Authorization") String value, @PartMap Map<String, RequestBody> m, @Part MultipartBody.Part profile_img);
+    Call<User> patchMe(@Header("Authorization") String value, @PartMap Map<String, RequestBody> m, @Part MultipartBody.Part profile_img);
 
     @PATCH("user/messages/{id}/checked")
     Call<JsonObject> patchChecked(@Header("Authorization") String value, @Path("id") String id, @Body JsonObject jsonObject);

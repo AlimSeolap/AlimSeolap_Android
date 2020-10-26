@@ -233,21 +233,21 @@ public class MainGame extends AppCompatActivity {
     };
 
     public void sendResult(JsonArray array) throws JSONException {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.add("data", array);
-        Log.d("게임평가", jsonObject.toString());
-        Call<JsonElement> callGME = service.postGameMessageEval(pref.getString("token",""), jsonObject);
-        callGME.enqueue(new Callback<JsonElement>() {
-            @Override
-            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                Log.d("게임평가전송 완료됨", response.toString());
-            }
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.add("data", array);
+            Log.d("게임평가", jsonObject.toString());
+            Call<JsonElement> callGME = service.postGameMessageEval(pref.getString("token",""), jsonObject);
+            callGME.enqueue(new Callback<JsonElement>() {
+                @Override
+                public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                    Log.d("게임평가전송 완료됨", response.toString());
+                }
 
-            @Override
-            public void onFailure(Call<JsonElement> call, Throwable t) {
-                Log.d("게임평가전송 실패", t.toString());
-            }
-        });
+                @Override
+                public void onFailure(Call<JsonElement> call, Throwable t) {
+                    Log.d("게임평가전송 실패", t.toString());
+                }
+            });
         Intent intent = new Intent(MainGame.this, Success.class);
         startActivity(intent);
         finish();

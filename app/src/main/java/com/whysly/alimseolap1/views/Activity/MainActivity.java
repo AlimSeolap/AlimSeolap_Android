@@ -164,6 +164,8 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
 
 
 
+
+
 //                WindowManager.LayoutParams window = new WindowManager.LayoutParams();
 //                window.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
 //                window.dimAmount = 0.75f;

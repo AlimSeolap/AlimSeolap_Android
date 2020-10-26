@@ -122,14 +122,14 @@ public class SettingsFragment extends Fragment {
                     username.setText(object.getString("nickname"));
                     SharedPreferences.Editor editor = pref.edit();
                     if (object.getString("profile_img").length() > 10) {
-                        Glide.with(getContext()).load("https://" + object.getString("profile_img").substring(10))
+                        Glide.with(getContext()).load(object.getString("profile_img"))
                                 .centerCrop()
                                 //.placeholder(R.drawable.alimi_sample)
                                 .error(R.drawable.alimi_sample)
                                 .into(ivImage);
-                        editor.putString("profilepic_path", "https://" + object.getString("profile_img").substring(10));
+                        editor.putString("profilepic_path",  object.getString("profile_img"));
                         editor.apply();
-                        Log.d("파일경로", pref.getString("profilepic_path", ""));
+                        Log.d("파일11경로", object.getString("profile_img"));
 
                     } else {
                         Glide.with(getContext()).load(pref.getString("profilepic_path",""))

@@ -34,6 +34,7 @@ import com.whysly.alimseolap1.models.Age;
 import com.whysly.alimseolap1.models.City;
 import com.whysly.alimseolap1.models.Province;
 import com.whysly.alimseolap1.models.State;
+import com.whysly.alimseolap1.models.User;
 import com.whysly.alimseolap1.views.Games.Introduce;
 
 import org.json.JSONException;
@@ -210,12 +211,12 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                         Log.d("나이", age);
                         SharedPreferences.Editor editor = pref.edit();
                         if (object.getString("profile_img").length() > 10) {
-                            Glide.with(getApplicationContext()).load("https://" + object.getString("profile_img").substring(10))
+                            Glide.with(getApplicationContext()).load(object.getString("profile_img"))
                                     .centerCrop()
                                     //.placeholder(R.drawable.alimi_sample)
                                     .error(R.drawable.alimi_sample)
                                     .into(ivImage);
-                            editor.putString("profilepic_path", "https://" + object.getString("profile_img").substring(10));
+                            editor.putString("profilepic_path", object.getString("profile_img"));
                             editor.apply();
                             Log.d("파일경로", pref.getString("profilepic_path", ""));
 
@@ -251,8 +252,6 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
             });
 
         }
-
-
 
         Call<List<Age>> call_age = service.getAges();
         call_age.enqueue(new Callback<List<Age>>() {
@@ -453,9 +452,7 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                         || email.getVisibility() != view.VISIBLE || nickname.getVisibility() != view.VISIBLE)
                 {
                 }
-                loading_dots.setVisibility(View.VISIBLE);
-                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
                 saveAllandPatch();
 
                 //Toast.makeText(this, "모든 정보를 입력해 주세요", Toast.LENGTH_SHORT).show();
@@ -499,6 +496,9 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
         } else if(nickname.length() == 0){
             Toast.makeText(getApplicationContext(), "닉네임을 입력해 주세요.", Toast.LENGTH_LONG).show();
         } else {
+            loading_dots.setVisibility(View.VISIBLE);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             File file = new File(pref.getString("new_profilepic_path", ""));
             RequestBody nickname = RequestBody.create(MediaType.parse("text/plain"),
                     this.nickname.getText().toString());
@@ -526,30 +526,33 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
             map.put("gender", gender);
             map.put("password", password);
             //@Part MultipartBody.Part filePart
-            Call<JsonObject> call_patchMe = service.patchMe(pref.getString("token", ""), map, profile_img);
-            call_patchMe.enqueue(new Callback<JsonObject>() {
+            Call<User> call_patchMe = service.patchMe(pref.getString("token", ""), map, profile_img);
+            call_patchMe.enqueue(new Callback<User>() {
                 @Override
-                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    try {
-                        JSONObject object = new JSONObject(response.body().toString());
-                        if(object.getString("profile_img").length() > 10) {
-                            editor.putString("profilepic_path", "https://" + object.getString("profile_img").substring(10));
+                public void onResponse(Call<User> call, Response<User> response) {
 
-                        } else {
-                        }
-                        System.out.println("981217" + object.getString("profile_img"));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+//                    if(response.body().getProfile_img().length() > 10) {
+//                        editor.putString("profilepic_path", "https://" + response.body().getProfile_img().substring(10));
+//
+//                    } else {
+//                    }
 
-                    editor.remove("new_profilepic_path");
                     editor.apply();
-                    complete();
+                    if(response.body().getFinished().equals(false)){
+
+                        game();
+
+                    }else{
+                        complete();
+
+                    }
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
                     // 첫 로그인(회원가입의 경우)
                 }
 
                 @Override
-                public void onFailure(Call<JsonObject> call, Throwable t) {
+                public void onFailure(Call<User> call, Throwable t) {
                     System.out.println("등록실패");
                     Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
                 }
@@ -577,9 +580,10 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
     }
 
     public void game(){
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(getApplicationContext(), Introduce.class);
         startActivity(intent);
         finish();
+        loading_dots.setVisibility(View.INVISIBLE);
         Toast.makeText(this, "정보가 저장되었습니다", Toast.LENGTH_SHORT).show();
     }
 
