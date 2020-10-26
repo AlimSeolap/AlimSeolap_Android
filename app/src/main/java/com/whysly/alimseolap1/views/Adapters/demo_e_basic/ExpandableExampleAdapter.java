@@ -269,9 +269,6 @@ public class ExpandableExampleAdapter
                 .filter(e -> simpleDateFormat.format(e.arrive_time).equals(date))
                 .sorted((o1, o2) -> o1.arrive_time.compareTo(o2.arrive_time) * -1)
                 .collect(Collectors.toList()).get(childPosition);
-
-
-
         // 데이터 결합
 //      holder.notiTitle.setText(data.getNotiTitle());
             Log.d("준영", childPosition + " 번째 알림의 extra_Title은 " + data.title + " 입니다.");

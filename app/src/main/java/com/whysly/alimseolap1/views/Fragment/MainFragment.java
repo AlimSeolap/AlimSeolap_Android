@@ -64,7 +64,7 @@ public class MainFragment extends Fragment {
     WebView webview;
     WebSettings settings;
     final public Handler handler1 = new Handler();
-    SharedPreferences pref;
+
     Retrofit retrofit;
     String pass;
     @Nullable
@@ -110,36 +110,40 @@ public class MainFragment extends Fragment {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         MyService service = retrofit.create(MyService.class);
-        pref = getContext().getSharedPreferences("data", Activity.MODE_PRIVATE);
+        SharedPreferences pref = getContext().getSharedPreferences("data", Activity.MODE_PRIVATE);
         Call<List<UserKeyword>> call_user_keyword = service.getUsersKeyword(pref.getString("token", ""));
         call_user_keyword.enqueue(new Callback<List<UserKeyword>>() {
             @Override
             public void onResponse(Call<List<UserKeyword>> call, Response<List<UserKeyword>> response) {
                 List<UserKeyword> keywords = response.body();
                 HashMap<String, Integer> map = new HashMap<>();
-                System.out.println("아나" + keywords.get(1).getPositive_value_count());
                 //positive z-score 구하기
                 for (int i = 0 ; i < keywords.size() ; i++){
                     map.put(keywords.get(i).getKeyword(), keywords.get(i).getPositive_value_count());
                     System.out.println(keywords.get(i).getPositive_value_count());
                 }
                 Z_value one = new Z_value();
-                HashMap<String, Double> z_value = one.getZ_value(map);
+                HashMap<String, Double> z_value = one.getZ_score(map);
+                for (int i = 0 ; i < keywords.size() ; i++){
+                    keywords.get(i).setZ_value(z_value.get(keywords.get(i).getKeyword()));
+                    System.out.println("z_value for" + keywords.get(i).getKeyword() + ": " + keywords.get(i).getZ_value());
+                }
                 Toast myToast = Toast.makeText(getContext(), z_value.toString(), Toast.LENGTH_SHORT);
 
                 myToast.show();
-                final Comparator<UserKeyword> comp = (k1, k2) -> Integer.compare( k1.getFinal_value_count(), k2.getFinal_value_count());
+                final Comparator<UserKeyword> comp = (k1, k2) -> Double.compare( k1.getZ_value(), k2.getZ_value());
                 List<UserKeyword> sortedList = keywords.stream()
                         .sorted(comp)
                         .collect(Collectors.toList());
-                //StringBuilder sb = new StringBuilder("\"word\":\"freq\"");
                 String sb = "\"word\":\"freq\"";
-                //StringBuilder sb = new StringBuilder();
+
+
                 if(keywords == null){
                 } else if(keywords.size() < 20) {
                     for (int i = 0; i < keywords.size(); i++) {
                         //sb.append(",\""+ sortedList.get(i).getKeyword() + "\":" + 8);
-                        sb = sb + ",\""+ sortedList.get(i).getKeyword() + "\":" + 8;
+                        sb = sb + ",\""+ sortedList.get(i).getKeyword() + "\":" + (i+1);
+                        System.out.println("sorted list is: " + sortedList.get(i).getZ_value());
                     }
                 } else  {
                     for (int i = 0; i < 21; i++) {
@@ -281,25 +285,48 @@ public class MainFragment extends Fragment {
     public void onResume() {
         super.onResume();
         MyService service = retrofit.create(MyService.class);
-        pref = getContext().getSharedPreferences("data", Activity.MODE_PRIVATE);
+        SharedPreferences pref = getContext().getSharedPreferences("data", Activity.MODE_PRIVATE);
         Call<List<UserKeyword>> call_user_keyword = service.getUsersKeyword(pref.getString("token", ""));
         call_user_keyword.enqueue(new Callback<List<UserKeyword>>() {
             @Override
             public void onResponse(Call<List<UserKeyword>> call, Response<List<UserKeyword>> response) {
                 List<UserKeyword> keywords = response.body();
-                final Comparator<UserKeyword> comp = (k1, k2) -> Integer.compare( k1.getFinal_value_count(), k2.getFinal_value_count());
+                HashMap<String, Integer> map = new HashMap<>();
+                //positive z-score 구하기
+                for (int i = 0 ; i < keywords.size() ; i++){
+                    map.put(keywords.get(i).getKeyword(), keywords.get(i).getPositive_value_count());
+                    System.out.println(keywords.get(i).getPositive_value_count());
+                }
+                //z_score 구하기
+                Z_value one = new Z_value();
+                HashMap<String, Double> z_value = one.getZ_score(map);
+                for (int i = 0 ; i < keywords.size() ; i++){
+                    keywords.get(i).setZ_value(z_value.get(keywords.get(i).getKeyword()));
+                    System.out.println("z_value for" + keywords.get(i).getKeyword() + ": " + keywords.get(i).getZ_value());
+                }
+                Toast myToast = Toast.makeText(getContext(), z_value.toString(), Toast.LENGTH_SHORT);
+
+                myToast.show();
+                final Comparator<UserKeyword> comp = (k1, k2) -> Double.compare( k1.getZ_value(), k2.getZ_value());
                 List<UserKeyword> sortedList = keywords.stream()
                         .sorted(comp)
                         .collect(Collectors.toList());
-                //StringBuilder sb = new StringBuilder("\"word\":\"freq\"");
+                double a= sortedList.get(0).getZ_value();
+                double b= sortedList.get(sortedList.size() - 1).getZ_value() - sortedList.get(0).getZ_value()  ;
+                for (i = 0; i < sortedList.size(); i++){
+                    double c = sortedList.get(i).getZ_value();
+                    int d= (int)Math.round((c - a)*(10/b) +1);
+                    sortedList.get(i).setZ_value(d);
+                }
                 String sb = "\"word\":\"freq\"";
-                //StringBuilder sb = new StringBuilder();
-                if(keywords == null){
 
+
+                if(keywords == null){
                 } else if(keywords.size() < 20) {
                     for (int i = 0; i < keywords.size(); i++) {
                         //sb.append(",\""+ sortedList.get(i).getKeyword() + "\":" + 8);
-                        sb = sb + ",\""+ sortedList.get(i).getKeyword() + "\":" + 8;
+                        sb = sb + ",\""+ sortedList.get(i).getKeyword() + "\":" + (int)sortedList.get(i).getZ_value();
+                        System.out.println("sorted list is: " + sortedList.get(i).getZ_value());
                     }
                 } else  {
                     for (int i = 0; i < 21; i++) {

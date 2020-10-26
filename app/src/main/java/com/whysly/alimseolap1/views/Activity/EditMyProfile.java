@@ -51,7 +51,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -211,6 +210,11 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                         Log.d("나이", age);
                         SharedPreferences.Editor editor = pref.edit();
                         if (object.getString("profile_img").length() > 10) {
+                            Glide.with(getApplicationContext()).load("https://" + object.getString("profile_img").substring(10))
+                                    .centerCrop()
+                                    //.placeholder(R.drawable.alimi_sample)
+                                    .error(R.drawable.alimi_sample)
+                                    .into(ivImage);
                             editor.putString("profilepic_path", "https://" + object.getString("profile_img").substring(10));
                             editor.apply();
                             Log.d("파일경로", pref.getString("profilepic_path", ""));
@@ -522,10 +526,22 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
             map.put("gender", gender);
             map.put("password", password);
             //@Part MultipartBody.Part filePart
-            Call<ResponseBody> call_patchMe = service.patchMe(pref.getString("token", ""), map, profile_img);
-            call_patchMe.enqueue(new Callback<ResponseBody>() {
+            Call<JsonObject> call_patchMe = service.patchMe(pref.getString("token", ""), map, profile_img);
+            call_patchMe.enqueue(new Callback<JsonObject>() {
                 @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    try {
+                        JSONObject object = new JSONObject(response.body().toString());
+                        if(object.getString("profile_img").length() > 10) {
+                            editor.putString("profilepic_path", "https://" + object.getString("profile_img").substring(10));
+
+                        } else {
+                        }
+                        System.out.println("981217" + object.getString("profile_img"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
                     editor.remove("new_profilepic_path");
                     editor.apply();
                     complete();
@@ -533,7 +549,7 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                 }
 
                 @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                public void onFailure(Call<JsonObject> call, Throwable t) {
                     System.out.println("등록실패");
                     Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
                 }
@@ -546,11 +562,10 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                loading_dots.setVisibility(View.INVISIBLE);
-
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
                 finish();
+                loading_dots.setVisibility(View.INVISIBLE);
                 Toast.makeText(getApplicationContext(), "정보가 저장되었습니다", Toast.LENGTH_SHORT).show();
             }
         }, 2000);

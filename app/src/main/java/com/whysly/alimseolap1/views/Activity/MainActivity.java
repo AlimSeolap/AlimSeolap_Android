@@ -102,7 +102,7 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
     BackPressedForFinish bp;
 
     String server_noti_id;
-    SharedPreferences pref;
+
 
     public static Context getContextOfApplication(){
         return mContext;
@@ -114,7 +114,7 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
                 setContentView(R.layout.activity_main);
                 bp = new BackPressedForFinish(this);
                 super.onCreate(savedInstanceState);
-                pref = getSharedPreferences("data", Activity.MODE_PRIVATE);
+                SharedPreferences pref = getSharedPreferences("data", Activity.MODE_PRIVATE);
 
                 if(pref.getString("login_method","").equals("")){
                     Intent loginIntent = new Intent(this, LoginActivity.class);
@@ -153,6 +153,8 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
 
                         }
                     });
+
+
 
 
 

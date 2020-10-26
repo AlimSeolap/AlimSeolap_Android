@@ -20,11 +20,20 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.signature.StringSignature;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.gson.JsonObject;
 import com.whysly.alimseolap1.R;
+import com.whysly.alimseolap1.interfaces.MyService;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.content.ContentValues.TAG;
 
@@ -36,19 +45,16 @@ public class SettingsFragment extends Fragment {
     Button update_button;
     Button version_check;
     SharedPreferences pref;
-
+    TextView username;
 
     public void Oncreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
     }
 
     public void versionCheck() {
         firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         displayWelcomeMessage();
     }
-
 
     private void displayWelcomeMessage(){
         //받아온 데이터 중 "latest_version" 라는 이름의 매개변수 값을 가져온다.
@@ -70,8 +76,6 @@ public class SettingsFragment extends Fragment {
         }
     }
 
-
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -85,7 +89,7 @@ public class SettingsFragment extends Fragment {
         System.out.println("981217" + latest_version);
         pref = getContext().getSharedPreferences("data", Activity.MODE_PRIVATE);
         String version = pref.getString("latestVersionInfo", "");
-
+        username = view.findViewById(R.id.username_display);
         version_check.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,6 +105,53 @@ public class SettingsFragment extends Fragment {
                 startActivity(intent);
             }
         });
+        final Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://172.30.1.18:8000/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        MyService service = retrofit.create(MyService.class);
+        Call<JsonObject> call_userinfo = service.getMe(pref.getString("token", ""));
+        call_userinfo.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                System.out.println("등록성공");
+                Log.d("postSignUpSNS", response.toString());
+                Log.d("postSignUpSNS", response.body().toString());
+                try {
+                    JSONObject object = new JSONObject(response.body().toString());
+                    username.setText(object.getString("nickname"));
+                    SharedPreferences.Editor editor = pref.edit();
+                    if (object.getString("profile_img").length() > 10) {
+                        Glide.with(getContext()).load("https://" + object.getString("profile_img").substring(10))
+                                .centerCrop()
+                                //.placeholder(R.drawable.alimi_sample)
+                                .error(R.drawable.alimi_sample)
+                                .into(ivImage);
+                        editor.putString("profilepic_path", "https://" + object.getString("profile_img").substring(10));
+                        editor.apply();
+                        Log.d("파일경로", pref.getString("profilepic_path", ""));
+
+                    } else {
+                        Glide.with(getContext()).load(pref.getString("profilepic_path",""))
+                                .centerCrop()
+                                //.placeholder(R.drawable.alimi_sample)
+                                .error(R.drawable.alimi_sample)
+                                .into(ivImage);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                System.out.println("등록실패");
+                Toast.makeText(getContext(), "로그인에 실패하였습니다.", Toast.LENGTH_LONG).show();
+                Log.d("postSignUpSNS", t.getMessage());
+                Log.d("postSignUpSNS", t.toString());
+            }
+        });
 
 //        File file = new File(pref.getString("profilepic_path",pref.getString("profilepicurl", "")));
 //        Log.d("pfpic_url", pref.getString("profilepic_path",pref.getString("profilepicurl", "")));
@@ -110,15 +161,15 @@ public class SettingsFragment extends Fragment {
         // String imageUrl = pref.getString("profilepic_path",pref.getString("profilepicurl", ""));
         // Glide로 이미지 표시하기
         Log.d("profilepic_path", pref.getString("profilepic_path",""));
-        Glide.with(getContext()).load(pref.getString("profilepic_path",""))
-                .centerCrop()
-                //.placeholder(R.drawable.alimi_sample)
-                //.error(R.drawable.alimi_sample)
-                .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
-                .into(ivImage)
-        ;
-        TextView username = view.findViewById(R.id.username_display);
-        username.setText(pref.getString("username", "알리미"));
+//        Glide.with(getContext()).load(pref.getString("profilepic_path",""))
+//                .centerCrop()
+//                //.placeholder(R.drawable.alimi_sample)
+//                //.error(R.drawable.alimi_sample)
+//                .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
+//                .into(ivImage)
+//        ;
+
+
         return view;
     }
 

@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class Z_value {
-    public HashMap<String, Double> getZ_value(HashMap<String, Integer> map) {
+    public HashMap<String, Double> getZ_score(HashMap<String, Integer> map) {
         ArrayList<Integer> values = new ArrayList<Integer>();
         for(Map.Entry<String,Integer> entry : map.entrySet()){
 
@@ -21,7 +21,7 @@ public class Z_value {
         for (Map.Entry<String, Integer> entry : entries) {
             System.out.print("key: "+ entry.getKey());
             System.out.println(", Value: "+ entry.getValue());
-            result.put(entry.getKey(), (mean - entry.getValue()) / SD);
+            result.put(entry.getKey(), (entry.getValue() - mean) / SD);
             System.out.println(result);
         }
         return result;
@@ -38,7 +38,7 @@ public class Z_value {
         return mean;
     }
 
-    public static double calculateSD(ArrayList<Integer> values, double mean)
+     public static double calculateSD(ArrayList<Integer> values, double mean)
     {
         double sum = 0.0, standardDeviation = 0.0;
         int length = values.size();

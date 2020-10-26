@@ -10,6 +10,7 @@ private String keyword;
 private int positive_value_count;
 private int negative_value_count;
 private int final_value_count;
+private double z_value;
 private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 public int getId() {
@@ -36,7 +37,15 @@ public void setPositive_value_count(int positive_value_count) {
 this.positive_value_count = positive_value_count;
 }
 
-public int getNegative_value_count() {
+public double getZ_value() {
+    return z_value;
+}
+
+public void setZ_value(double z_value) {
+    this.z_value = z_value;
+}
+
+    public int getNegative_value_count() {
 return negative_value_count;
 }
 
