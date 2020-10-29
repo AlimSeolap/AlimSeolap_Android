@@ -252,7 +252,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     System.out.println("getAdpaterPosition은 " + getAdapterPosition());
                     LocalBroadcastManager.getInstance(activity).sendBroadcast(intent);
                     return true;
-
                 }
             });
         }

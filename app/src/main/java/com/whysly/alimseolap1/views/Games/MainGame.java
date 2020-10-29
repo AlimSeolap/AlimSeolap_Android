@@ -49,11 +49,15 @@ public class MainGame extends AppCompatActivity {
     SharedPreferences pref;
     LottieAnimationView lottie;
     HashMap<Integer, Boolean> map = new HashMap<>();
+    int i;
 
     JsonArray array = new JsonArray();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = new Intent(MainGame.this, Success.class);
+        startActivity(intent);
+        finish();
         setContentView(R.layout.game_layout);
         pref = getSharedPreferences("data", MODE_PRIVATE);
         lottie = findViewById(R.id.timer);
@@ -66,7 +70,7 @@ public class MainGame extends AppCompatActivity {
         ne = new ArrayList<>();
         recyclerViewAdapter = new GameRecyclerViewAdapter(mContext);
         final Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://172.30.1.18:8000/")
+                .baseUrl("http://118.67.129.104/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         service = retrofit.create(MyService.class);

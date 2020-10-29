@@ -113,7 +113,7 @@ public class LoginActivity extends AppCompatActivity   {
         super.onCreate(savedInstanceState);
         bp = new BackPressedForFinish(this);
         retrofit = new Retrofit.Builder()
-                .baseUrl("http://172.30.1.18:8000/")
+                .baseUrl("http://118.67.129.104/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         service = retrofit.create(MyService.class);

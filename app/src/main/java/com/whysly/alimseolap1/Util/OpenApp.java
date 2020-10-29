@@ -21,12 +21,12 @@ public class OpenApp {
 
     public static void openApp(Context context, String redirecting_url, long server_noti_id) {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://172.30.1.18:8000/")
+                .baseUrl("http://118.67.129.104/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         SharedPreferences pref = context.getSharedPreferences("data", MODE_PRIVATE);
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        Uri uri = Uri.parse(redirecting_url);
+        Uri uri = Uri.parse("https://" +redirecting_url);
         intent.setData(uri);
         context.startActivity(intent);
         JsonObject jsonObject = new JsonObject();

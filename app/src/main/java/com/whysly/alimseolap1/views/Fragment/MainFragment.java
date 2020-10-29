@@ -106,7 +106,7 @@ public class MainFragment extends Fragment {
 
         webview.loadUrl("file:///android_asset/index.html");
         retrofit = new Retrofit.Builder()
-                .baseUrl("http://172.30.1.18:8000/")
+                .baseUrl("http://118.67.129.104/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         MyService service = retrofit.create(MyService.class);
@@ -304,6 +304,9 @@ public class MainFragment extends Fragment {
                 List<UserKeyword> keywords = response.body();
                 HashMap<String, Integer> map = new HashMap<>();
                 HashMap<String, Integer> map2 = new HashMap<>();
+                if(keywords.size() == 0) {
+                    return;
+                }
                 //positive z-score 구하기
                 for (int i = 0 ; i < keywords.size() ; i++){
                     map.put(keywords.get(i).getKeyword(), keywords.get(i).getPositive_value_count());
@@ -314,6 +317,7 @@ public class MainFragment extends Fragment {
                     map2.put(keywords.get(i).getKeyword(), keywords.get(i).getNegative_value_count());
                     System.out.println(keywords.get(i).getNegative_value_count());
                 }
+
 
 
                 Z_value one = new Z_value();
@@ -409,75 +413,6 @@ public class MainFragment extends Fragment {
         webview = null;
 
     }
-
-//    private BroadcastReceiver mBroadcastReceiver_remove = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            Log.d("AllFragment", "브로드캐스트 수신");
-//            String noti_id_string = ((TextView) recyclerView.findViewHolderForAdapterPosition(intent.getIntExtra("position", 0)).itemView.findViewById(R.id.noti_id)).getText().toString();
-//            int noti_id = 0;
-//            try {
-//                noti_id = Integer.parseInt(noti_id_string);
-//            }
-//            catch(NumberFormatException nfe) {
-//                System.out.println("Could not parse " + nfe);
-//            }
-//            model.updateRealEvaluation(noti_id, 5);
-//            System.out.println("브로드케스트고 받은 어댑터포지션 값은 " + intent.getIntExtra("position", 0));
-//            recyclerViewAdapter.removeItemView(intent.getIntExtra("position", 0));
-//            //  notidata.get(intent.getIntExtra("position", 0));
-//            // intent ..
-//        }
-//    };
-
-//    private BroadcastReceiver mBroadcastReceiver_intent = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            NotificationDatabase database;
-//            database = NotificationDatabase.getNotificationDatabase(getActivity(), pref.getString("uid", ""));
-//            System.out.println(intent.getIntExtra("adapterposition",0));
-//
-//           // pendingIntent = database.notificationDao().loadNotification(intent.getIntExtra("adapterposition",0)+1).cls_intent;
-//            Log.d("AllFragment", pendingIntent + "를 받았습니다.");
-//
-//
-//            try {
-//                 intent_redirect = Intent.parseUri(pendingIntent, Intent.URI_INTENT_SCHEME);
-//
-//            }catch (URISyntaxException e){
-//                e.printStackTrace();
-//            }
-//            intent1 = new Intent(Intent.ACTION_VIEW, Uri.parse(pendingIntent));
-//
-//            startActivity(intent1);
-//            // intent ..
-//
-//
-//            try {
-//                // Create a new instance of a JSONObject
-//                final JSONObject object = new JSONObject();
-//
-//                // With put you can add a name/value pair to the JSONObject
-//                object.put("name", "test");
-//                object.put("content", "Hello World!!!1");
-//                object.put("year", 2016);
-//                object.put("value", 3.23);
-//                object.put("member", true);
-//                object.put("null_value", JSONObject.NULL);
-//
-//                // Calling toString() on the JSONObject returns the JSON in string format.
-//                final String json = object.toString();
-//
-//            } catch (
-//                    JSONException e) {
-//                Log.e("TAG", "Failed to create JSONObject", e);
-//            }
-//        }
-//
-//    };
-
-
-
 
 
 }

@@ -92,7 +92,7 @@ public class MainViewModel extends AndroidViewModel {
     public void  updateRealEvaluation(long id, long this_user_real_evaluation, String token) {
 
         final Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://172.30.1.18:8000/")
+                .baseUrl("http://118.67.129.104/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         Log.d("현우", "Retrofit 빌드 성공");

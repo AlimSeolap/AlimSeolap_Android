@@ -67,7 +67,6 @@ public class PosFragment extends Fragment {
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
 
-
         recyclerView.setLayoutManager(linearLayoutManager);
         //recyclerView.setLayoutManager(linearLayoutManager);
 

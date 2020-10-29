@@ -125,7 +125,7 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
                     SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     NotificationDatabase db = NotificationDatabase.getNotificationDatabase(getApplicationContext(), pref.getString("uid",""));
                     final Retrofit retrofit = new Retrofit.Builder()
-                            .baseUrl("http://172.30.1.18:8000/")
+                            .baseUrl("http://118.67.129.104/")
                             .addConverterFactory(GsonConverterFactory.create())
                             .build();
                     MyService service = retrofit.create(MyService.class);

@@ -156,7 +156,7 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
         yourFilterList2.add("후반");
         username = findViewById(R.id.username);
         final Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://172.30.1.18:8000/")
+                .baseUrl("http://118.67.129.104/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         pref = getSharedPreferences("data", MODE_PRIVATE);
