@@ -55,9 +55,6 @@ public class MainGame extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = new Intent(MainGame.this, Success.class);
-        startActivity(intent);
-        finish();
         setContentView(R.layout.game_layout);
         pref = getSharedPreferences("data", MODE_PRIVATE);
         lottie = findViewById(R.id.timer);

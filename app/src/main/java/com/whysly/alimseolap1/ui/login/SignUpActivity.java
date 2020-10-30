@@ -34,31 +34,6 @@ public class SignUpActivity extends AppCompatActivity  {
     FirebaseUser currentUser;
 
 
-//    private void updateUI(FirebaseUser user) {
-//        //hideProgressBar();
-//        if (user != null) {
-//            mBinding.status.setText(getString(R.string.emailpassword_status_fmt,
-//                    user.getEmail(), user.isEmailVerified()));
-//            mBinding.detail.setText(getString(R.string.firebase_status_fmt, user.getUid()));
-//
-//            mBinding.emailPasswordButtons.setVisibility(View.GONE);
-//            mBinding.emailPasswordFields.setVisibility(View.GONE);
-//            mBinding.signedInButtons.setVisibility(View.VISIBLE);
-//
-//            if (user.isEmailVerified()) {
-//                mBinding.verifyEmailButton.setVisibility(View.GONE);
-//            } else {
-//                mBinding.verifyEmailButton.setVisibility(View.VISIBLE);
-//            }
-//        } else {
-//            mBinding.status.setText(R.string.signed_out);
-//            mBinding.detail.setText(null);
-//
-//            mBinding.emailPasswordButtons.setVisibility(View.VISIBLE);
-//            mBinding.emailPasswordFields.setVisibility(View.VISIBLE);
-//            mBinding.signedInButtons.setVisibility(View.GONE);
-//        }
-//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

@@ -61,7 +61,6 @@ public class NegFragment extends Fragment {
     final public Handler handler2 = new Handler();
     SharedPreferences pref;
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -96,7 +95,6 @@ public class NegFragment extends Fragment {
             recyclerView.smoothScrollToPosition(recyclerViewAdapter.getItemCount());
         });
 
-
         if (recyclerViewAdapter.getItemCount() == 0) {
             lottieAnimationView.setVisibility(View.VISIBLE);
         }
@@ -110,12 +108,7 @@ public class NegFragment extends Fragment {
 
     }
 
-
-
-
     int i = 0;
-
-
 
     public void onLottieClick2(View view) {
 
@@ -141,17 +134,6 @@ public class NegFragment extends Fragment {
 //            // intent ..
 //        }
 //    };
-
-
-
-
-
-
-
-
-
-
-
 
     final ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
         @Override
@@ -227,7 +209,6 @@ public class NegFragment extends Fragment {
                 }, 1000);
             }
 
-
             // 스와이프 하여 제거하면 밑의 코드가 실행되면서 스와이프 된 뷰홀더의 위치 값을 통해 어댑터에서 아이템이 지워졌다고 노티파이 해줌.
             Log.d("준영", "noti_idx1: " + viewHolder.getAdapterPosition());
             Log.d("준영", "noti_idx2: " + noti_position);
@@ -268,9 +249,6 @@ public class NegFragment extends Fragment {
 //            NotificationDatabase db = NotificationDatabase.getNotificationDatabase(getContext());
 //            user_id = db.notificationDao().loadNotification(noti_id).user_id;
 //            notititle = db.notificationDao().loadNotification(noti_id).title;
-
-
-
 
             MyService service = retrofit.create(MyService.class);
             //json 객체 생성하여 값을 넣어줌

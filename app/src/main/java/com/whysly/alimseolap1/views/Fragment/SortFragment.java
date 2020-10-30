@@ -54,11 +54,7 @@ public class SortFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         SortViewModel viewModel = new ViewModelProvider(requireActivity()).get(SortViewModel.class);
-
         View view = inflater.inflate(R.layout.sort_fragment, null);
-
-
-
 
 //        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
  //       ((AppCompatActivity)getActivity()).getSupportActionBar().setCustomView(R.layout.custom_toolbar);

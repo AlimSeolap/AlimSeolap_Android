@@ -538,12 +538,18 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
 //                    }
 
                     editor.apply();
-                    if(response.body().getFinished().equals(false)){
+                    try {
+                        if (response.body().getFinished().equals(false)) {
 
+                            game();
+
+                        } else {
+                            complete();
+
+                        }
+                    } catch (NullPointerException e){
+                        System.out.println(e);
                         game();
-
-                    }else{
-                        complete();
 
                     }
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
@@ -555,6 +561,7 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                 public void onFailure(Call<User> call, Throwable t) {
                     System.out.println("등록실패");
                     Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                 }
             });
         }

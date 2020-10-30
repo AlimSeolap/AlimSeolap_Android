@@ -60,6 +60,7 @@ public class MainFragment extends Fragment {
     MainViewModel model;
     private SmoothNonSwipeableViewPager viewPager;
     LottieAnimationView animationView;
+    LottieAnimationView pop_anim;
     private int currentPosition;
     WebView webview;
     WebSettings settings;
@@ -80,11 +81,6 @@ public class MainFragment extends Fragment {
         activity.getSupportActionBar().setCustomView(viewToolbar, new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
 
 
-
-
-
-
-
         webview = (WebView) view.findViewById(R.id.webViewmain);
         settings = webview.getSettings();
         //settings.setLoadsImagesAutomatically(true);
@@ -100,10 +96,7 @@ public class MainFragment extends Fragment {
 //                                      }
 //                                  }
 //        );
-
         LottieAnimationView lottieAnimationView = view.findViewById(R.id.empty_noti);
-
-
         webview.loadUrl("file:///android_asset/index.html");
         retrofit = new Retrofit.Builder()
                 .baseUrl("http://118.67.129.104/")

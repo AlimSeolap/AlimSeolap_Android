@@ -13,6 +13,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,6 +29,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -105,12 +107,13 @@ public class LoginActivity extends AppCompatActivity   {
     Retrofit retrofit;
     BackPressedForFinish bp;
     MyService service;
-
+    LottieAnimationView loading_dots;
     String what;
 //ActivityCompat.finishAffinity(this);
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
         bp = new BackPressedForFinish(this);
         retrofit = new Retrofit.Builder()
                 .baseUrl("http://118.67.129.104/")
@@ -128,10 +131,12 @@ public class LoginActivity extends AppCompatActivity   {
                 //,OAUTH_CALLBACK_INTENT
                 // SDK 4.1.4 버전부터는 OAUTH_CALLBACK_INTENT변수를 사용하지 않습니다.
         );
+
 //        getHashKey();
 
         mAuth = FirebaseAuth.getInstance();
-        setContentView(R.layout.activity_login);
+
+        loading_dots = findViewById(R.id.loading_dots_login);
         loginViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
 
@@ -387,9 +392,6 @@ public class LoginActivity extends AppCompatActivity   {
                 loadUserfromServer();
 
 
-
-                // 첫 로그인(회원가입의 경우)
-
             }
 
             @Override
@@ -461,6 +463,7 @@ public class LoginActivity extends AppCompatActivity   {
                     Intent login_success = new Intent(context, MainActivity.class);
                     startActivity(login_success);
                 }
+                loading_dots.setVisibility(View.INVISIBLE);
                 finish();
 
             }
@@ -471,9 +474,9 @@ public class LoginActivity extends AppCompatActivity   {
                 Toast.makeText(getApplicationContext(), "로그인에 실패하였습니다.", Toast.LENGTH_LONG).show();
                 Log.d("postSignUpSNS", t.getMessage());
                 Log.d("postSignUpSNS", t.toString());
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                loading_dots.setVisibility(View.INVISIBLE);
             }
-
-
         });
 
     }
@@ -506,14 +509,16 @@ public class LoginActivity extends AppCompatActivity   {
                     Session.getCurrentSession().addCallback(sessionCallback);
                 }
                 Session.getCurrentSession().open(AuthType.KAKAO_LOGIN_ALL, this);
-                //btn_kakao_test.performClick();
-
                 break;
 
             case R.id.facebook_login :
                 LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile"));
 
         }
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        loading_dots.setVisibility(View.VISIBLE);
+
     }
 
 
@@ -549,16 +554,15 @@ public class LoginActivity extends AppCompatActivity   {
 //                mOauthExpires.setText(String.valueOf(expiresAt));
 //                mOauthTokenType.setText(tokenType);
 //                mOAuthState.setText(mOAuthLoginModule.getState(getApplicationContext()).toString());
-
                 new RequestApiTask(context).execute();
-
-
 
             } else {
                 String errorCode = mOAuthLoginModule.getLastErrorCode(context).getCode();
                 String errorDesc = mOAuthLoginModule.getLastErrorDesc(context);
                 Toast.makeText(context, "errorCode:" + errorCode
                         + ", errorDesc:" + errorDesc, Toast.LENGTH_SHORT).show();
+                loading_dots.setVisibility(View.INVISIBLE);
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             }
         };
     };
@@ -749,29 +753,18 @@ public class LoginActivity extends AppCompatActivity   {
                 LoginMethod.setEMAIL(response.getString("email"));
                 LoginMethod.setSnsToken(token);
                 LoginMethod.setSnsUid(response.getString("id"));
-                //upDateUserInfo(name);
 
                 try {
                     email = response.getString("email");
                 } catch (Exception e) {
                     email = null;
                 }
-
-//                mApiResultText.setText((String) content);
-//                리퀘스트 변경
-//                Request(mContext, this.token, id, email);
-
             } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println("981217"  +  e.toString());
             }
-
             LoginMethod.setLoginMethod("naver");
-
             updateUiWithUser(new LoggedInUserView(LoginMethod.getUserName()));
-
-
-
 
         }
 
@@ -806,15 +799,21 @@ public class LoginActivity extends AppCompatActivity   {
 
                     if(result == ApiErrorCode.CLIENT_ERROR_CODE) {
                         Toast.makeText(getApplicationContext(), "네트워크 연결이 불안정합니다. 다시 시도해 주세요.", Toast.LENGTH_SHORT).show();
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                        loading_dots.setVisibility(View.INVISIBLE);
                         finish();
                     } else {
                         Toast.makeText(getApplicationContext(),"로그인 도중 오류가 발생했습니다: "+errorResult.getErrorMessage(),Toast.LENGTH_SHORT).show();
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                        loading_dots.setVisibility(View.INVISIBLE);
                     }
                 }
 
                 @Override
                 public void onSessionClosed(ErrorResult errorResult) {
                     Toast.makeText(getApplicationContext(),"세션이 닫혔습니다. 다시 시도해 주세요: "+errorResult.getErrorMessage(),Toast.LENGTH_SHORT).show();
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                    loading_dots.setVisibility(View.INVISIBLE);
                 }
 
                 @Override
@@ -832,6 +831,7 @@ public class LoginActivity extends AppCompatActivity   {
                     LoginMethod.setSnsUid(String.valueOf(result.getId()));
                     LoginMethod.setSnsToken(accessToken.toString());
                     updateUiWithUser(new LoggedInUserView(result.getKakaoAccount().getProfile().getNickname()));
+
                     //startActivity(intent);
                     //finish();
                     Toast.makeText(getApplicationContext(),"카카오톡 로그인에 성공하였습니다. ",Toast.LENGTH_SHORT).show();
@@ -844,6 +844,8 @@ public class LoginActivity extends AppCompatActivity   {
         @Override
         public void onSessionOpenFailed(KakaoException e) {
             Toast.makeText(getApplicationContext(), "로그인 도중 오류가 발생했습니다. 인터넷 연결을 확인해주세요: "+e.toString(), Toast.LENGTH_SHORT).show();
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            loading_dots.setVisibility(View.INVISIBLE);
         }
 
 

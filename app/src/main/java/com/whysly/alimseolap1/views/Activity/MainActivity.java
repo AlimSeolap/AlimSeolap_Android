@@ -321,6 +321,10 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
                 intent.putExtra("from","main");
                 startActivity(intent);
                 break ;
+            case R.id.privacy_policy :
+                Intent intent2 = new Intent(this, PrivacyPolicy.class);
+                startActivity(intent2);
+                break ;
             case R.id.suggest :
                 send();
             break ;

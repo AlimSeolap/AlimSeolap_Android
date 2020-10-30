@@ -200,6 +200,8 @@
 
         </LinearLayout>
         <LinearLayout
+            android:onClick="onSettingClick"
+            android:id="@+id/privacy_policy"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:orientation="horizontal"

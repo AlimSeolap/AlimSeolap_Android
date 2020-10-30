@@ -59,6 +59,7 @@
         <activity android:name=".views.Adapters.demo_e_basic.ExpandableExampleActivity" />
         <activity android:name=".views.Activity.WebViewActivity" />
         <activity android:name=".views.Activity.DeveloperMode" />
+        <activity android:name=".views.Activity.PrivacyPolicy" />
         <activity
             android:name=".views.Games.Success"
             android:screenOrientation="portrait"/>

@@ -19,7 +19,21 @@
             android:id="@+id/wordcloud_toolbar"
             android:layout_width="match_parent"
             android:layout_height="170dp"
-            app:layout_scrollFlags="scroll|snap"/>
+            app:layout_scrollFlags="scroll|snap">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/empty_noti"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:layout_gravity="center"
+            android:background="@color/mdtp_white"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="false"
+            app:lottie_repeatMode="restart"
+            app:lottie_rawRes="@raw/pop"
+            android:visibility="visible"/>
+
+        </androidx.appcompat.widget.Toolbar>
 
         <LinearLayout
             android:layout_width="match_parent"

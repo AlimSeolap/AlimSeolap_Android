@@ -15,8 +15,8 @@ public class GameNotiItem {
         this.noti_date = noti_date;
         this.notitext = notitext;
         this.item_id = item_id;
-
     }
+
     @PrimaryKey(autoGenerate = true)
     public long id;
 

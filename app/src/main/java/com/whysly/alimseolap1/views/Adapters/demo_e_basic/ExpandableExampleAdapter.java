@@ -54,7 +54,7 @@ public class ExpandableExampleAdapter
     // NOTE: Make accessible with short name
     private List<NotificationEntity> entities = new ArrayList<>();
     private Context context;
-
+    NotificationEntity data;
     public static abstract class MyBaseViewHolder extends AbstractExpandableItemViewHolder {
         public FrameLayout mContainer;
         public TextView mTextView;
@@ -265,13 +265,17 @@ public class ExpandableExampleAdapter
                 .distinct()
                 .collect(Collectors.toList()).get(groupPosition);
 
-        NotificationEntity data = entities.stream()
-                .filter(e -> simpleDateFormat.format(e.arrive_time).equals(date))
-                .sorted((o1, o2) -> o1.arrive_time.compareTo(o2.arrive_time) * -1)
-                .collect(Collectors.toList()).get(childPosition);
+        try {
+            data = entities.stream()
+                    .filter(e -> simpleDateFormat.format(e.arrive_time).equals(date))
+                    .sorted((o1, o2) -> o1.arrive_time.compareTo(o2.arrive_time) * -1)
+                    .collect(Collectors.toList()).get(childPosition);
+        } catch (IndexOutOfBoundsException e){
+            System.out.println(e);
+        }
         // 데이터 결합
 //      holder.notiTitle.setText(data.getNotiTitle());
-            Log.d("준영", childPosition + " 번째 알림의 extra_Title은 " + data.title + " 입니다.");
+        Log.d("준영", childPosition + " 번째 알림의 extra_Title은 " + data.title + " 입니다.");
         holder.notiText.setText(data.content);
         Log.d("준영", childPosition + " 번째 알림의 extra_text은 " + data.redirecting_url + " 입니다.");
 //        holder.extra_info_text.setText("extra_info_text : " + data.getExtra_info_text());

@@ -67,14 +67,14 @@ public class SettingsFragment extends Fragment {
                 Toast.LENGTH_SHORT).show();
         Log.i(TAG, "파이어베이스에서 받아온 최신 버전 정보 : "+latest_version);
         if(!MyAppVersion().equals(latest_version)) {
-            version_stat.setText("업데이트 해주세요. 현재버전: " + MyAppVersion() + "최신버전: " + latest_version);
+            version_stat.setText("업데이트 해주세요.(" + MyAppVersion() + ") 최신버전: " + latest_version);
             version_check.setVisibility(View.GONE);
             update_button.setVisibility(View.VISIBLE);
-
         } else {
             version_stat.setText("앱이 최신버전 입니다." + latest_version);
         }
     }
+
 
     @Nullable
     @Override
