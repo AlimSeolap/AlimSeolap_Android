@@ -22,7 +22,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.viewpager.widget.ViewPager;
 
 import com.airbnb.lottie.LottieAnimationView;
@@ -31,10 +30,7 @@ import com.whysly.alimseolap1.Util.Z_value;
 import com.whysly.alimseolap1.interfaces.MyService;
 import com.whysly.alimseolap1.models.UserKeyword;
 import com.whysly.alimseolap1.views.Activity.MainActivity;
-import com.whysly.alimseolap1.views.Activity.MainViewModel;
 import com.whysly.alimseolap1.views.Activity.WebViewActivity;
-import com.whysly.alimseolap1.views.Adapters.RecyclerViewAdapter;
-import com.whysly.alimseolap1.views.Adapters.RecyclerViewEmptySupport;
 import com.whysly.alimseolap1.views.Adapters.SmooliderAdapter;
 import com.whysly.alimseolap1.views.SmoothNonSwipeableViewPager;
 
@@ -50,14 +46,6 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainFragment extends Fragment {
-    RecyclerViewAdapter recyclerViewAdapter;
-    RecyclerViewEmptySupport recyclerView;
-    LinearLayoutManager linearLayoutManager;
-    int user_id;
-    Intent intent_redirect;
-    String pendingIntent;
-    Intent intent1;
-    MainViewModel model;
     private SmoothNonSwipeableViewPager viewPager;
     LottieAnimationView animationView;
     LottieAnimationView pop_anim;
