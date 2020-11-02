@@ -2,20 +2,20 @@ package com.whysly.alimseolap1.views.Games;
 
 import android.animation.ObjectAnimator;
 import android.content.Intent;
-import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.style.AbsoluteSizeSpan;
-import android.text.style.ForegroundColorSpan;
+import android.view.Display;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -35,6 +35,8 @@ public class Introduce extends AppCompatActivity {
         setContentView(R.layout.introduce);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         ScrollView scrollView = findViewById(R.id.introduce_scroll_view);
+        LinearLayout linearLayout = findViewById(R.id.introduce_linear_layout);
+        LinearLayout linearLayout2 = findViewById(R.id.introduce_linear_layout2);
         Button introduce_accept = findViewById(R.id.introduce_accept_btn);
         TextView a1 = findViewById(R.id.a1);
         CircleImageView b1 = findViewById(R.id.b1);
@@ -42,10 +44,35 @@ public class Introduce extends AppCompatActivity {
         CircleImageView c1 = findViewById(R.id.c1);
         TextView c2 = findViewById(R.id.c2);
         TextView c3 = findViewById(R.id.c3);
-        TextView describe = findViewById(R.id.describe);
+        ImageView introduce = findViewById(R.id.introduce_text_image);
 
+
+        Display display = getWindowManager().getDefaultDisplay();  // in Activity
+        /* getActivity().getWindowManager().getDefaultDisplay() */ // in Fragment
+        Point size = new Point();
+        display.getSize(size); // or getSize(size)
+        int width = size.x;
+        int height_pixel = size.y;
+        float density = getBaseContext().getResources().getDisplayMetrics().density;
+        int dpWidth  = (int)((float)width/density);
+        int dpHeight = (int)((float)height_pixel/density);
+        ViewGroup.LayoutParams params = linearLayout.getLayoutParams();
+        params.height =  height_pixel;
+        linearLayout.setLayoutParams(params);
+        linearLayout2.requestLayout();
+        ViewGroup.LayoutParams params2 = linearLayout2.getLayoutParams();
+        params2.height =  height_pixel;
+        linearLayout2.setLayoutParams(params2);
+        linearLayout2.requestLayout();
+
+
+
+
+        //System.out.println(linearLayout.getHeight());
+        System.out.println("기기사이즈" + width +"/" + height_pixel+"/" + density+"/" + dpHeight+"/" + linearLayout.getHeight());
+        //TextView describe = findViewById(R.id.describe);
         TextView tv = findViewById(R.id.text60sec);
-        String string = "시간은 ‘50초’ 드릴게요.";
+//        String string = "시간은 ‘50초’ 드릴게요.";
         Animation animation1 = AnimationUtils.loadAnimation(this, R.anim.popup_without_transition);
         Animation animation2 = AnimationUtils.loadAnimation(this, R.anim.popup);
         Animation animation3 = AnimationUtils.loadAnimation(this, R.anim.popup);
@@ -114,10 +141,12 @@ public class Introduce extends AppCompatActivity {
                     @Override
                     public void onGlobalLayout() {
                         scrollView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                        ObjectAnimator objectAnimator = ObjectAnimator.ofInt(scrollView, "scrollY",  scrollView.getBottom() +100);
+                        float a = 46*density;
+                        ObjectAnimator objectAnimator = ObjectAnimator.ofInt(scrollView, "scrollY",  scrollView.getBottom() + (int) a + 6);
                         objectAnimator.setDuration(1000);
                         objectAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
                         objectAnimator.start();
+                        //scrollView.getBottom()
                     }
                 });
                 //replace this line to scroll up or down
@@ -128,16 +157,16 @@ public class Introduce extends AppCompatActivity {
         }, 6500);
 
 
-        int color = Color.parseColor("#F5B517");
+//        int color = Color.parseColor("#F5B517");
+//
+//        int size = 80;
 
-        int size = 80;
-
-        SpannableStringBuilder builder = new SpannableStringBuilder(string);
-
-        builder.setSpan(new ForegroundColorSpan(color), 4, 10, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        builder.setSpan(new AbsoluteSizeSpan(size), 4, 10, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        tv.append(builder);
+//        SpannableStringBuilder builder = new SpannableStringBuilder(string);
+//
+//        builder.setSpan(new ForegroundColorSpan(color), 4, 10, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//        builder.setSpan(new AbsoluteSizeSpan(size), 4, 10, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//
+//        tv.append(builder);
 
 
         introduce_accept.setOnClickListener(new View.OnClickListener() {
