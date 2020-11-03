@@ -22,10 +22,10 @@
             app:layout_scrollFlags="scroll|snap">
 
         <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/empty_noti"
+            android:id="@+id/pop"
             android:layout_width="140dp"
             android:layout_height="140dp"
-            android:layout_gravity="center"
+            android:layout_gravity="center_horizontal"
             android:background="@color/mdtp_white"
             app:lottie_autoPlay="true"
             app:lottie_loop="false"

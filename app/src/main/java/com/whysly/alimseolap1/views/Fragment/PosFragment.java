@@ -60,6 +60,7 @@ public class PosFragment extends Fragment {
         ActionBar actionBar = ((MainActivity)getActivity()).getSupportActionBar();
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         LottieAnimationView lottieAnimationView = view.findViewById(R.id.empty_noti);
+        LottieAnimationView popAnim = view.findViewById(R.id.pop);
         pref = getContext().getSharedPreferences("data", Context.MODE_PRIVATE);
 
         recyclerView =(RecyclerViewEmptySupport) view.findViewById(R.id.recycler1);
@@ -68,10 +69,7 @@ public class PosFragment extends Fragment {
         linearLayoutManager.setStackFromEnd(true);
 
         recyclerView.setLayoutManager(linearLayoutManager);
-        //recyclerView.setLayoutManager(linearLayoutManager);
-
         recyclerViewAdapter = new RecyclerViewAdapter(getContext());
-        //recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.setEmptyView(view.findViewById(R.id.empty_noti));
 

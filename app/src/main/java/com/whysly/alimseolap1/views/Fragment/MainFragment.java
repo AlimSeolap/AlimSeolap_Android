@@ -68,7 +68,6 @@ public class MainFragment extends Fragment {
         View viewToolbar = getActivity().getLayoutInflater().inflate(R.layout.custom_toolbar_all, null);
         activity.getSupportActionBar().setCustomView(viewToolbar, new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
 
-
         webview = (WebView) view.findViewById(R.id.webViewmain);
         settings = webview.getSettings();
         //settings.setLoadsImagesAutomatically(true);
@@ -84,6 +83,7 @@ public class MainFragment extends Fragment {
 //                                      }
 //                                  }
 //        );
+
         LottieAnimationView lottieAnimationView = view.findViewById(R.id.empty_noti);
         webview.loadUrl("file:///android_asset/index.html");
         retrofit = new Retrofit.Builder()
@@ -110,11 +110,9 @@ public class MainFragment extends Fragment {
                     System.out.println(keywords.get(i).getNegative_value_count());
                 }
 
-
                 Z_value one = new Z_value();
                 HashMap<String, Double> p_value = one.getZ_score(map);
                 HashMap<String, Double> n_value = one.getZ_score(map2);
-
 
                 for (int i = 0 ; i < keywords.size() ; i++){
                     keywords.get(i).setZ_value(p_value.get(keywords.get(i).getKeyword()) - n_value.get(keywords.get(i).getKeyword()));

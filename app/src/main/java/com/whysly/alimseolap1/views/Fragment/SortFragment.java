@@ -87,8 +87,6 @@ public class SortFragment extends Fragment {
 
         activity.getSupportActionBar().setCustomView(viewToolbar, new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
 
-
-
         tab_layout = (TabLayout) view.findViewById(R.id.tab_layout_category);
         tab_layout.getTabAt(0).setText("전체");
         tab_layout.getTabAt(1).setText("쇼핑");
@@ -96,11 +94,7 @@ public class SortFragment extends Fragment {
         tab_layout.getTabAt(3).setText("컨텐츠");
         tab_layout.getTabAt(4).setText("기타");
 
-
-
-
         ViewPager pager = view.findViewById(R.id.category_pager);
-
 
         //캐싱을 해놓을 프래그먼트 개수
         pager.setOffscreenPageLimit(5);
@@ -130,11 +124,6 @@ public class SortFragment extends Fragment {
 
         //뷰페이저와 탭레이아웃 연동
         tab_layout.setupWithViewPager(pager);
-
-
-
-
-
 
         return view;
     }
