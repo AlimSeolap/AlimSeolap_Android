@@ -94,6 +94,7 @@ public class MainFragment extends Fragment {
         SharedPreferences pref = getContext().getSharedPreferences("data", Activity.MODE_PRIVATE);
         Call<List<UserKeyword>> call_user_keyword = service.getUsersKeyword(pref.getString("token", ""));
         call_user_keyword.enqueue(new Callback<List<UserKeyword>>() {
+
             @Override
             public void onResponse(Call<List<UserKeyword>> call, Response<List<UserKeyword>> response) {
                 List<UserKeyword> keywords = response.body();
