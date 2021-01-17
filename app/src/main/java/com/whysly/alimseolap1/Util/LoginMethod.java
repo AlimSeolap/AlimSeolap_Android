@@ -2,6 +2,8 @@ package com.whysly.alimseolap1.Util;
 
 import android.content.Context;
 
+import androidx.annotation.Nullable;
+
 import com.whysly.alimseolap1.views.Activity.MainActivity;
 
 public class LoginMethod {
@@ -78,7 +80,8 @@ public class LoginMethod {
         return PROFILE_PIC_URL;
     }
 
-    public static void setProfilePicUrl(String profilePicUrl) {
+
+    public static void setProfilePicUrl(@Nullable String profilePicUrl) {
         PROFILE_PIC_URL = profilePicUrl;
 //        SharedPreferences.Editor editor = sf.edit();
 //        editor.putString("profilepicUrl", profilePicUrl);

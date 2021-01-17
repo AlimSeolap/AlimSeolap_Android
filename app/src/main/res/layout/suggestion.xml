@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="34dp"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:onClick="onSettingClick"
+            android:id="@+id/back_arrow"
+            android:layout_width="18.48dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/search_arrow"
+            android:rotation="180"
+            android:scaleType="fitXY"
+            android:layout_marginLeft="21dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="제안하기"
+            android:textSize="15dp"
+            android:fontFamily="@font/notosanskr_medium"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/edit_profile"
+        android:onClick="onSettingClick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"/>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:orientation="horizontal">
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:textCursorDrawable="@drawable/color_cursor"
+            app:met_iconPadding="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            app:met_baseColor="#000000"
+            app:met_primaryColor="#F5B517"
+            app:met_floatingLabel="highlight"
+            app:met_floatingLabelText="제목"
+            android:hint="제목"
+            android:id="@+id/title_edt"
+            android:inputType="textEmailAddress" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:textCursorDrawable="@drawable/color_cursor"
+            android:id="@+id/content_edt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="30dp"
+            android:background="@drawable/edittext_border"
+            android:ems="10"
+            android:gravity="top"
+            android:hint="내용"
+            android:inputType="textMultiLine"
+            android:lines="12"
+            android:maxLines="10"
+            android:minLines="14"
+            android:padding="0dp"
+            android:singleLine="false"
+            app:met_baseColor="#000000"
+            app:met_floatingLabel="highlight"
+            app:met_floatingLabelText="내용"
+            app:met_primaryColor="#F5B517" />
+
+    </LinearLayout>
+
+
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_gravity="bottom">
+
+        <Button
+            android:id="@+id/send_btn"
+            android:layout_width="320dp"
+            android:layout_height="54dp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="44dp"
+            android:background="@drawable/submit_btn"
+            android:fontFamily="@font/notosanskr_regular"
+            android:onClick="onSuggestClick"
+            android:text="제출하기"
+            android:textColor="@color/mdtp_white"
+            android:textSize="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+</LinearLayout>

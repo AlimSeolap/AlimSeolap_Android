@@ -9,18 +9,65 @@ public class Message {
     private int id;
     private String title;
     private String content;
-    private String redirecting_url;
     private String targetGender;
     private String type;
-    private Boolean attach;
+    private Boolean attached;
     private String created_at;
     private Object updated_at;
     private Object deleted_at;
     private int user;
-    private Marketer marketer;
-    private int users_messages_id;
-    private List<Keyword> keyword = null;
+    private List<String> keywords;
+
+    //private Marketer marketer;
+    //private int users_messages_id;
+    //private List<Keyword> keyword = null;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
+    //////////////////////////////////////
+    private String summary1;
+    private String summary2;
+    private String summary3;
+    private Boolean is_rejected;
+
+    public List<String> getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(List<String> keywords) {
+        this.keywords = keywords;
+    }
+
+    public Boolean getIs_rejected() {
+        return is_rejected;
+    }
+
+    public void setIs_rejected(Boolean is_rejected) {
+        this.is_rejected = is_rejected;
+    }
+
+    public String getSummary1() {
+        return summary1;
+    }
+
+    public void setSummary1(String summary1) {
+        this.summary1 = summary1;
+    }
+
+    public String getSummary2() {
+        return summary2;
+    }
+
+    public void setSummary2(String summary2) {
+        this.summary2 = summary2;
+    }
+
+    public String getSummary3() {
+        return summary3;
+    }
+
+    public void setSummary3(String summary3) {
+        this.summary3 = summary3;
+    }
 
     public int getId() {
         return id;
@@ -46,14 +93,6 @@ public class Message {
         this.content = content;
     }
 
-    public String getRedirecting_url() {
-        return redirecting_url;
-    }
-
-    public void setRedirecting_url(String redirecting_url) {
-        this.redirecting_url = redirecting_url;
-    }
-
     public String getTargetGender() {
         return targetGender;
     }
@@ -70,12 +109,12 @@ public class Message {
         this.type = type;
     }
 
-    public Boolean getAttach() {
-        return attach;
+    public Boolean getAttached() {
+        return attached;
     }
 
-    public void setAttach(Boolean attach) {
-        this.attach = attach;
+    public void setAttached(Boolean attached) {
+        this.attached = attached;
     }
 
     public String getCreated_at() {
@@ -110,29 +149,9 @@ public class Message {
         this.user = user;
     }
 
-    public Marketer getMarketer() {
-        return marketer;
-    }
 
-    public void setMarketer(Marketer marketer) {
-        this.marketer = marketer;
-    }
 
-    public int getUsers_messages_id() {
-        return users_messages_id;
-    }
 
-    public void setUsers_messages_id(int users_messages_id) {
-        this.users_messages_id = users_messages_id;
-    }
-
-    public List<Keyword> getKeyword() {
-        return keyword;
-    }
-
-    public void setKeyword(List<Keyword> keyword) {
-        this.keyword = keyword;
-    }
 
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;

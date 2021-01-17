@@ -154,27 +154,20 @@ public class MainGame extends AppCompatActivity {
             int noti_position = viewHolder.getAdapterPosition();
             String noti_id_string = ((TextView) recyclerView.findViewHolderForAdapterPosition(viewHolder.getAdapterPosition()).itemView.findViewById(R.id.noti_id)).getText().toString();
             System.out.println(noti_id_string);
-
             int noti_id = 0;
-
             try {
                 noti_id = Integer.parseInt(noti_id_string);
             }
             catch(NumberFormatException nfe) {
                 System.out.println("Could not parse " + nfe);
             }
-
             boolean evaluate = false;
-
             //스와이프 방향에 따라 DB에서  this_user_real_evaluation 값을 지정해줌줌
-
             if (direction == 8) {
                 evaluate = true;
-
             } else if (direction == 4) {
                 evaluate = false;
             }
-
 //            ObjectMapper mapper = new ObjectMapper();
 //            Game game = new Game();
 

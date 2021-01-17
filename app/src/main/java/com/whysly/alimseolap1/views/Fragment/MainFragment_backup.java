@@ -167,7 +167,7 @@ public class MainFragment_backup extends Fragment {
         LocalBroadcastManager.getInstance(this.getContext()).registerReceiver(mBroadcastReceiver_intent,
                 new IntentFilter("intent_redirect"));
         //recyclerView = view.findViewById(R.id.recycler1);
-        recyclerView =(RecyclerViewEmptySupport) view.findViewById(R.id.recycler1);
+        //recyclerView =(RecyclerViewEmptySupport) view.findViewById(R.id.recycler1);
         linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);

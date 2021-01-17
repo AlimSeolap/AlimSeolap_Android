@@ -113,7 +113,7 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
 
     HashMap<String,String> map1 = new HashMap<String,String>();
     HashMap<String,String> map2 = new HashMap<String,String>();
-    String from = "default";
+    int from = 0;
     Intent intent;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -164,7 +164,7 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
         Intent intent = getIntent();
         String email_text = intent.getStringExtra("email");
         String password = intent.getStringExtra("password");
-        from = intent.getStringExtra("from");
+        from = intent.getIntExtra("from",0);
         ivImage = findViewById(R.id.profile_pic2);
         // Glide로 이미지 표시하기
         // String imageUrl = pref.getString("profilepic_path",pref.getString("profilepicurl", ""));
@@ -174,7 +174,7 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                 .error(R.drawable.alimi_sample)
                 .into(ivImage);
 
-        if (from.equals("signup")) {
+        if (from == 1) {
             this.email.setText(email_text);
             this.email.setEnabled(false);
         } else {
@@ -307,12 +307,15 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                     dropDownView2.setVisibility(View.VISIBLE);
                     ageIsSelected = false;
                     dropDownView2.expand(true);
+                    agerange1.setText(dropDownView.getFilterTextView().getText());
                 } else {
                     dropDownView2.setVisibility(View.INVISIBLE);
+                    agerange1.setText(dropDownView.getFilterTextView().getText());
                     age_code = map1.get(agerange1.getText().toString());
+                    Log.d("age_code" , agerange1.getText().toString() + age_code);
                     ageIsSelected = true;
                 }
-                agerange1.setText(dropDownView.getFilterTextView().getText());
+
                 //Do something with the selected position
             }
         });
@@ -440,6 +443,8 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
 //                    //.error(R.drawable.alimi_sample)
 //                    .into(ivImage)
 //            ;
+
+
     }
 
     public void onEditClick(View view) {
@@ -452,7 +457,7 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                         || email.getVisibility() != view.VISIBLE || nickname.getVisibility() != view.VISIBLE)
                 {
                 }
-
+                progressON();
                 saveAllandPatch();
 
                 //Toast.makeText(this, "모든 정보를 입력해 주세요", Toast.LENGTH_SHORT).show();
@@ -509,8 +514,8 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
             RequestBody age = RequestBody.create(MediaType.parse("text/plain"), age_code);
             RequestBody area = RequestBody.create(MediaType.parse("text/plain"), area_code);
             //RequestBody profile_img = RequestBody.create(MediaType.parse("multipart/form-data"),file);
-            RequestBody password = RequestBody.create(MediaType.parse("text/plain"),
-                    this.nickname.getText().toString());
+//            RequestBody password = RequestBody.create(MediaType.parse("text/plain"),
+//                    intent.getStringExtra("password"));
             JsonObject jsonObject = new JsonObject();
             RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
             MultipartBody.Part profile_img = MultipartBody.Part.createFormData("profile_img", file.getName(), requestFile);
@@ -520,52 +525,123 @@ public class EditMyProfile extends BaseActivity implements MainInterface.View{
                 profile_img = null;
             }
             Map<String, RequestBody> map = new HashMap<>();
-            map.put("nickname", nickname);
-            map.put("age", age);
-            map.put("area", area);
             map.put("gender", gender);
-            map.put("password", password);
+            map.put("nickname", nickname);
+
+//            map.put("password", password);
             //@Part MultipartBody.Part filePart
-            Call<User> call_patchMe = service.patchMe(pref.getString("token", ""), map, profile_img);
-            call_patchMe.enqueue(new Callback<User>() {
-                @Override
-                public void onResponse(Call<User> call, Response<User> response) {
 
-//                    if(response.body().getProfile_img().length() > 10) {
-//                        editor.putString("profilepic_path", "https://" + response.body().getProfile_img().substring(10));
-//
-//                    } else {
-//                    }
+            if (intent.getStringExtra("from").equals("1")){
+                Log.d("내정보수정", "1");
+                map.put("age_id", age);
+                map.put("area_id", area);
 
-                    editor.apply();
-                    try {
-                        if (response.body().getFinished().equals(false)) {
 
-                            game();
+                RequestBody email = RequestBody.create(MediaType.parse("text/plain"),
+                        intent.getStringExtra("email"));
 
-                        } else {
-                            complete();
+                map.put("email", email);
 
-                        }
-                    } catch (NullPointerException e){
-                        System.out.println(e);
-                        game();
+                RequestBody confirm_password = RequestBody.create(MediaType.parse("text/plain"),
+                        intent.getStringExtra("password"));
+                map.put("confirm_password", confirm_password);
 
+                RequestBody password = RequestBody.create(MediaType.parse("text/plain"),
+                        intent.getStringExtra("password"));
+
+                map.put("password", password);
+                Call<User> call_signMeUp = service.signMeUp( map, profile_img);
+                call_signMeUp.enqueue(new Callback<User>() {
+                    @Override
+                    public void onResponse(Call<User> call, Response<User> response) {
+                        Log.d("회원가입", response.toString());
+                        Log.d("회원가입", response.body().toString());
+                        Log.d("내정보수정", "2");
+                        editor.apply();
+                        signInAfterUp(intent.getStringExtra("email"), intent.getStringExtra("password"));
+                        progressON();
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     }
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
-                    // 첫 로그인(회원가입의 경우)
+                    @Override
+                    public void onFailure(Call<User> call, Throwable t) {
+                        Log.d("내정보수정", "3");
+                        System.out.println("등록실패");
+                        Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                    }
+                });
+
+            } else {
+                map.put("age", age);
+                map.put("area", area);
+                Call<JsonObject> call_patchMe = service.patchMe(pref.getString("token", ""), map, profile_img);
+                        call_patchMe.enqueue(new Callback<JsonObject>() {
+                            @Override
+                            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                                Log.d("4" , response.body().toString());
+
+                                try {
+                                    JSONObject object = new JSONObject(response.body().toString());
+                                    if (!object.getBoolean("finished")) {
+                                        game();
+                                    } else {
+                                        complete();
+
+                                    }
+
+                                }catch (Exception e) {
+                                    complete();
+                                }
+                        // 첫 로그인(회원가입의 경우)
+                            }
+
+                            @Override
+                            public void onFailure(Call<JsonObject> call, Throwable t) {
+                                Log.d("내정보수정", "5");
+                                System.out.println("등록실패");
+                                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+                                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                            }
+                        });
+                }
+            }
+        }
+
+        public void signInAfterUp(String id, String password) {
+            final Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl("http://118.67.129.104/")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            MyService service = retrofit.create(MyService.class);
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("email", id);
+            jsonObject.addProperty("password", password);
+            Call<JsonObject> call_signIn = service.postSignIn(jsonObject);
+            call_signIn.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    try {
+                        JSONObject object = new JSONObject(response.body().toString());
+                        SharedPreferences.Editor editor = pref.edit();
+                        editor.putString("token",object.getString("token"));
+                        editor.putString("uid", object.getString("id"));
+                        editor.putString("login_method", "default");
+                        editor.apply();
+                        game();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
-                public void onFailure(Call<User> call, Throwable t) {
-                    System.out.println("등록실패");
-                    Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                public void onFailure(Call<JsonObject> call, Throwable t) {
                 }
             });
+
+
+
         }
-    }
 
     public void complete(){
         final Handler handler = new Handler();

@@ -25,7 +25,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDialog;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -69,6 +69,7 @@ import com.whysly.alimseolap1.Util.BackPressedForFinish;
 import com.whysly.alimseolap1.Util.GoogleSignInOptionSingleTone;
 import com.whysly.alimseolap1.Util.LoginMethod;
 import com.whysly.alimseolap1.interfaces.MyService;
+import com.whysly.alimseolap1.views.Activity.BaseActivity;
 import com.whysly.alimseolap1.views.Activity.EditMyProfile;
 import com.whysly.alimseolap1.views.Activity.MainActivity;
 
@@ -88,7 +89,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class LoginActivity extends AppCompatActivity   {
+public class LoginActivity extends BaseActivity   {
 
     private static String OAUTH_CLIENT_ID = "LsegA9Z8oxP_xHg3zxEx";
     private static String OAUTH_CLIENT_SECRET = "Yu4I_6fhMh";
@@ -109,7 +110,10 @@ public class LoginActivity extends AppCompatActivity   {
     MyService service;
     LottieAnimationView loading_dots;
     String what;
-//ActivityCompat.finishAffinity(this);
+    AppCompatDialog progressDialog;
+//ActivityCompat.finishAffinity(this);\
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,6 +123,7 @@ public class LoginActivity extends AppCompatActivity   {
                 .baseUrl("http://118.67.129.104/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+        
         service = retrofit.create(MyService.class);
         pref = getSharedPreferences("data", MODE_PRIVATE);
         context = LoginActivity.this;
@@ -143,6 +148,8 @@ public class LoginActivity extends AppCompatActivity   {
         final EditText usernameEditText = findViewById(R.id.username);
         final EditText passwordEditText = findViewById(R.id.password);
         final Button loginButton = findViewById(R.id.login);
+
+
         //final ProgressBar loadingProgressBar = findViewById(R.id.loading);
         ImageButton signInButtonGoogle = findViewById(R.id.google_login);
         ImageButton signInButtonNaver = findViewById(R.id.naver_login);
@@ -169,6 +176,8 @@ public class LoginActivity extends AppCompatActivity   {
                                }
                            }
                        });
+
+
                    LoginMethod.setEMAIL("fb_"+Profile.getCurrentProfile().getId()+"@user.user");
                    LoginMethod.setLoginMethod("facebook");
                    String.valueOf(loginResult.getAccessToken());
@@ -256,8 +265,7 @@ public class LoginActivity extends AppCompatActivity   {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    loginViewModel.login(usernameEditText.getText().toString(),
-                            passwordEditText.getText().toString());
+                    onLoginClick(findViewById(R.id.login));
                 }
                 return false;
             }
@@ -268,10 +276,16 @@ public class LoginActivity extends AppCompatActivity   {
             public void onClick(View v) {
                 //loadingProgressBar.setVisibility(View.VISIBLE);
                 //얘들은 검증안하고 로그인 시킴 ㅋㅋ
-                loginViewModel.login(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString());
-                signIn(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString());
+                //loginViewModel.login(usernameEditText.getText().toString(),
+                //       passwordEditText.getText().toString());
+
+                try{
+                    signIn(usernameEditText.getText().toString(),
+                            passwordEditText.getText().toString());
+                }catch (Exception e){
+                    Toast.makeText(context, "로그인 실패", Toast.LENGTH_SHORT);
+                }
+
                // loadingProgressBar.setVisibility(View.INVISIBLE);
             }
         });
@@ -291,6 +305,8 @@ public class LoginActivity extends AppCompatActivity   {
 
 
     }
+
+
 
 
     private void signIn(String email, String password) {
@@ -317,6 +333,7 @@ public class LoginActivity extends AppCompatActivity   {
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(context, "로그인에 실패하였습니다.", Toast.LENGTH_SHORT);
             }
         });
     }
@@ -383,9 +400,10 @@ public class LoginActivity extends AppCompatActivity   {
                     editor.putString("login_method", LoginMethod.getLoginMethod());
                     editor.putString("email", LoginMethod.getEMAIL());
                     editor.apply();
+                    Log.d("token", object1.getString("token") );
+                    Log.d("token", pref.getString("token", "") );
                     JSONArray movieArray = object1.getJSONArray("user");
                     what = movieArray.getJSONObject(0).getJSONObject("fields").getString("age");
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -423,6 +441,7 @@ public class LoginActivity extends AppCompatActivity   {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 String name;
+
                 try {
                     SharedPreferences.Editor editor = pref.edit();
                     JSONObject object = new JSONObject(response.body().toString());
@@ -455,6 +474,7 @@ public class LoginActivity extends AppCompatActivity   {
                     Intent intent = new Intent(context, EditMyProfile.class);
                     intent.putExtra("from", "login");
                     intent.putExtra("game", "false");
+                    intent.putExtra("password", pref.getString("token", ""));
                     startActivity(intent);
                 } else {
                     String welcome = getString(R.string.welcome) + name;
@@ -463,7 +483,7 @@ public class LoginActivity extends AppCompatActivity   {
                     Intent login_success = new Intent(context, MainActivity.class);
                     startActivity(login_success);
                 }
-                loading_dots.setVisibility(View.INVISIBLE);
+
                 finish();
 
             }
@@ -475,7 +495,7 @@ public class LoginActivity extends AppCompatActivity   {
                 Log.d("postSignUpSNS", t.getMessage());
                 Log.d("postSignUpSNS", t.toString());
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                loading_dots.setVisibility(View.INVISIBLE);
+                progressOFF();
             }
         });
 
@@ -488,9 +508,14 @@ public class LoginActivity extends AppCompatActivity   {
 
 
     public void onLoginClick(View view) {
+        progressON();
         switch (view.getId()) {
             case R.id.google_login :
                 signInWithGoogle();
+                break ;
+
+            case R.id.login :
+
                 break ;
 
             case R.id.sign_up :
@@ -515,9 +540,8 @@ public class LoginActivity extends AppCompatActivity   {
                 LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile"));
 
         }
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        loading_dots.setVisibility(View.VISIBLE);
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+//                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
     }
 
@@ -561,7 +585,8 @@ public class LoginActivity extends AppCompatActivity   {
                 String errorDesc = mOAuthLoginModule.getLastErrorDesc(context);
                 Toast.makeText(context, "errorCode:" + errorCode
                         + ", errorDesc:" + errorDesc, Toast.LENGTH_SHORT).show();
-                loading_dots.setVisibility(View.INVISIBLE);
+                //loading_dots.setVisibility(View.INVISIBLE);
+                progressOFF();
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             }
         };
@@ -683,6 +708,8 @@ public class LoginActivity extends AppCompatActivity   {
         // [END create_user_with_email]
     }
 
+
+
     /////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -800,21 +827,19 @@ public class LoginActivity extends AppCompatActivity   {
                     if(result == ApiErrorCode.CLIENT_ERROR_CODE) {
                         Toast.makeText(getApplicationContext(), "네트워크 연결이 불안정합니다. 다시 시도해 주세요.", Toast.LENGTH_SHORT).show();
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                        loading_dots.setVisibility(View.INVISIBLE);
+                        progressOFF();
                         finish();
                     } else {
                         Toast.makeText(getApplicationContext(),"로그인 도중 오류가 발생했습니다: "+errorResult.getErrorMessage(),Toast.LENGTH_SHORT).show();
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                        loading_dots.setVisibility(View.INVISIBLE);
-                    }
+                        progressOFF();                    }
                 }
 
                 @Override
                 public void onSessionClosed(ErrorResult errorResult) {
                     Toast.makeText(getApplicationContext(),"세션이 닫혔습니다. 다시 시도해 주세요: "+errorResult.getErrorMessage(),Toast.LENGTH_SHORT).show();
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                    loading_dots.setVisibility(View.INVISIBLE);
-                }
+                    progressOFF();                }
 
                 @Override
                 public void onSuccess(MeV2Response result) {
@@ -827,7 +852,12 @@ public class LoginActivity extends AppCompatActivity   {
                     accessToken = Session.getCurrentSession().getTokenInfo();
                     LoginMethod.setEMAIL(result.getKakaoAccount().getEmail());
                     LoginMethod.setUserName(result.getKakaoAccount().getProfile().getNickname().toString());
-                    LoginMethod.setProfilePicUrl(result.getKakaoAccount().getProfile().getProfileImageUrl().toString());
+
+                    try {
+                        LoginMethod.setProfilePicUrl(result.getKakaoAccount().getProfile().getProfileImageUrl().toString());
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                     LoginMethod.setSnsUid(String.valueOf(result.getId()));
                     LoginMethod.setSnsToken(accessToken.toString());
                     updateUiWithUser(new LoggedInUserView(result.getKakaoAccount().getProfile().getNickname()));
@@ -845,35 +875,41 @@ public class LoginActivity extends AppCompatActivity   {
         public void onSessionOpenFailed(KakaoException e) {
             Toast.makeText(getApplicationContext(), "로그인 도중 오류가 발생했습니다. 인터넷 연결을 확인해주세요: "+e.toString(), Toast.LENGTH_SHORT).show();
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-            loading_dots.setVisibility(View.INVISIBLE);
+            progressOFF();
         }
+
+
+
 
 
 
 
     }
 
-
-
-//    private class RequestApiTask2 extends AsyncTask<Void, Void, String> {
-//        @Override
-//        protected void onPreExecute() {
-//            mApiResultText.setText((String) "");
-//        }
+//    public void login() {
 //
-//        @Override
-//        protected String doInBackground(Void... params) {
-//            String url = "https://openapi.naver.com/v1/nid/me";
-//            String at = mOAuthLoginModule.getAccessToken(context);
-//            return mOAuthLoginModule.requestApi(context, at, url);
-//        }
 //
-//        protected void onPostExecute(String content) {
-//            mApiResultText.setText((String) content);
-//        }
 //    }
 //
 //
+//    @Override
+//    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//        // TODO Auto-generated method stub
+//
+//        //오버라이드한 onEditorAction() 메소드
+//
+//        if(v.getId()==R.id.password && actionId==EditorInfo.IME_ACTION_DONE){ // 뷰의 id를 식별, 키보드의 완료 키 입력 검출
+//            login();
+//
+//            //이 부분에 원하는 이벤트를 작성합니다
+//            //이 부분에 원하는 이벤트를 작성합니다
+//            //이 부분에 원하는 이벤트를 작성합니다
+//
+//        }
+//
+//        return false;
+//    }
+
 
 
 }

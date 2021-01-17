@@ -28,8 +28,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.facebook.AccessToken;
@@ -49,16 +47,13 @@ import com.nhn.android.naverlogin.OAuthLogin;
 import com.whysly.alimseolap1.R;
 import com.whysly.alimseolap1.Util.BackPressedForFinish;
 import com.whysly.alimseolap1.Util.GoogleSignInOptionSingleTone;
-import com.whysly.alimseolap1.Util.LoginMethod;
 import com.whysly.alimseolap1.interfaces.MainInterface;
 import com.whysly.alimseolap1.interfaces.MyService;
 import com.whysly.alimseolap1.models.Message;
-import com.whysly.alimseolap1.models.NotiData;
 import com.whysly.alimseolap1.models.databases.NotificationDatabase;
 import com.whysly.alimseolap1.models.entities.NotificationEntity;
 import com.whysly.alimseolap1.ui.login.LoginActivity;
 import com.whysly.alimseolap1.views.Adapters.ContentsPagerAdapter;
-import com.whysly.alimseolap1.views.Adapters.RecyclerViewAdapter;
 import com.whysly.alimseolap1.views.Fragment.MainFragment;
 import com.whysly.alimseolap1.views.Fragment.SettingsFragment;
 import com.whysly.alimseolap1.views.Fragment.SortFragment;
@@ -77,13 +72,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class MainActivity extends BaseActivity implements MainInterface.View {
-
     private ViewPager view_pager;
     private TabLayout tab_layout;
-    RecyclerViewAdapter recyclerViewAdapter;
-    RecyclerView recyclerView;
-    List<NotiData> notiData;
-    LinearLayoutManager linearLayoutManager;
     public static Context mContext;
     WindowManager wm;
     android.view.View v;
@@ -100,28 +90,24 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
         }
     };
     BackPressedForFinish bp;
-
     String server_noti_id;
-
 
     public static Context getContextOfApplication(){
         return mContext;
     }
-
-
             @Override
             protected void onCreate(Bundle savedInstanceState) {
                 setContentView(R.layout.activity_main);
                 bp = new BackPressedForFinish(this);
                 super.onCreate(savedInstanceState);
                 SharedPreferences pref = getSharedPreferences("data", Activity.MODE_PRIVATE);
-
                 if(pref.getString("login_method","").equals("")){
                     Intent loginIntent = new Intent(this, LoginActivity.class);
                     startActivity(loginIntent);
                     finish();
                 }
                 else {
+                    Log.d("Message", "받아오기 준비");
                     SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     NotificationDatabase db = NotificationDatabase.getNotificationDatabase(getApplicationContext(), pref.getString("uid",""));
                     final Retrofit retrofit = new Retrofit.Builder()
@@ -133,23 +119,28 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
                     call_user_message.enqueue(new Callback<List<Message>>() {
                         @Override
                         public void onResponse(Call<List<Message>> call, Response<List<Message>> response) {
+                            Log.d("Message", "받아옴");
+                            Log.d("Message 내용", response.body().toString());
                             List<Message> messages = response.body();
                             if(messages == null){
+                                Log.d("Message", "없음");
                                 return;
                             } else {
                                 for (int i = 0; i < messages.size(); i++) {
                                     Message m = messages.get(i);
                                     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                                     Date date = new Date();
-                                    server_noti_id = String.valueOf(m.getUsers_messages_id());
-                                    Log.d("server_noti_id", String.valueOf(m.getUsers_messages_id()));
-                                    db.notificationDao().insertNotification(new NotificationEntity(m.getUser(), m.getRedirecting_url(), m.getTitle(), m.getTitle(), m.getContent(), date, m.getUsers_messages_id()));
+                                    String summary = m.getSummary1() + m.getSummary2() + m.getSummary3();
+                                    m.getKeywords().toString().replace("[", "").replace("]", "").replace(" ", "");
+                                    Log.d("메시지 키워드", m.getKeywords().toString());
+                                    db.notificationDao().insertNotification(new NotificationEntity(m.getUser(), summary, m.getTitle() , m.getTitle(), m.getContent(), date, m.getId()));
                                 }
                             }
                         }
 
                         @Override
                         public void onFailure(Call<List<Message>> call, Throwable t) {
+                            Log.d("failed to get message", t.getMessage());
 
                         }
                     });
@@ -285,14 +276,12 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
 ////            LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
 ////            v =  inflater.inflate(R.layout.floating_guide, null);
 //                        startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
-////            wm.addView(v, windowManagerParams);
+////            wm.addView(v, windowManagerParams); 01022978355
 //                    }
 
                 }
 
-
-
-    }
+            }
 
 
 
@@ -326,7 +315,8 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
                 startActivity(intent2);
                 break ;
             case R.id.suggest :
-                send();
+                Intent intent1 = new Intent(this, Suggest.class);
+                startActivity(intent1);
             break ;
             case R.id.introduce :
                 Intent intent3 = new Intent(Intent.ACTION_VIEW, Uri.parse("http://13.125.224.216/home/"));
@@ -346,6 +336,7 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
                 NotificationDatabase db = NotificationDatabase.getNotificationDatabase(getApplicationContext(), pref.getString("uid",""));
                 switch (pref.getString("login_method", "")) {
                     case "default":
+                        db.destroyInstance();
                         editor.clear().apply();
                         startActivity(intent_logout);
                         this.finish();
@@ -556,16 +547,7 @@ public class MainActivity extends BaseActivity implements MainInterface.View {
     }
 
 
-    public void send() {
-        Intent email = new Intent(Intent.ACTION_SEND);
-        email.setPackage("com.google.android.gm");
-        email.setType("plain/Text");
-        email.putExtra(Intent.EXTRA_EMAIL, new String[]{"planet1217@naver.com"});
-        email.putExtra(Intent.EXTRA_SUBJECT, "<" + getString(R.string.app_name) + " " + "제안하기" + ">");
-        email.putExtra(Intent.EXTRA_TEXT, "유저아이디 (UserID):" + LoginMethod.getUserName() + "\n기기명 (Device):\n안드로이드 OS (Android OS):\n내용 (Content):\n");
-        email.setType("message/rfc822");
-        startActivity(email);
-    }
+
 
     @Override
     protected void onDestroy() {

@@ -20,12 +20,13 @@ public class PrivacyPolicy extends BaseActivity implements MainInterface.View {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.privacy_policy);
         webview = (WebView) findViewById(R.id.policy_webView);
-        webview .setHorizontalScrollBarEnabled(false);
-        webview .setVerticalScrollBarEnabled(false);
-        webview.loadUrl("https://s3.ap-northeast-2.amazonaws.com/whysly.org/privacy-policy/privacy-policy.html");
-    }
+        webview.setHorizontalScrollBarEnabled(false);
+        webview.setVerticalScrollBarEnabled(false);
+        webview.loadUrl("https://kr.object.ncloudstorage.com/notification-drawer/html_messages/message14.html");
 
-    //https://s3.ap-northeast-2.amazonaws.com/whysly.org/privacy-policy/privacy-policy.html
+    }
+    //
+    //    //https://s3.ap-northeast-2.amazonaws.com/whysly.org/privacy-policy/privacy-policy.html
 
     public void onPolicyClick(View view) {
         switch (view.getId()) {

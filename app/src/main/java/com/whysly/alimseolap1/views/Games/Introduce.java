@@ -20,13 +20,13 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.whysly.alimseolap1.R;
+import com.whysly.alimseolap1.views.Activity.BaseActivity;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class Introduce extends AppCompatActivity {
+public class Introduce extends BaseActivity {
 
 
     @Override
@@ -177,6 +177,7 @@ public class Introduce extends AppCompatActivity {
                 finish();
             }
         });
+
 
 
     }

@@ -1,27 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.Toolbar
+<com.google.android.material.appbar.CollapsingToolbarLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="177dp"
     android:background="@color/colorTransparent"
-    android:orientation="horizontal"
+    android:orientation="vertical"
+    android:padding="0dp"
     android:layout_gravity="center_horizontal"
     android:gravity="center_horizontal">
 
+    <com.whysly.alimseolap1.views.SmoothNonSwipeableViewPager
+        android:id="@+id/smoolider"
+        android:layout_width="match_parent"
+        android:layout_height="166dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="5dp"
+        android:visibility="visible">
+    </com.whysly.alimseolap1.views.SmoothNonSwipeableViewPager>
 
 
-                        <WebView
-                            android:id="@+id/webViewmain"
-                            android:layout_width="300dp"
-                            android:layout_height="167dp"
-                            android:layout_gravity="center_horizontal"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginRight="5dp">
-                        </WebView>
-
-
-
-
-
-</androidx.appcompat.widget.Toolbar>
+</com.google.android.material.appbar.CollapsingToolbarLayout>

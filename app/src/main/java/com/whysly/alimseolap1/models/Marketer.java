@@ -14,6 +14,7 @@ private int areaId;
 private String profileImg;
 private String signupChannel;
 private String lastSignInDate;
+private String company_name;
 private String role;
 private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -25,9 +26,17 @@ public void setId(int id) {
 this.id = id;
 }
 
-public String getEmail() {
-return email;
+public String getCompany_name() {
+    return company_name;
 }
+
+public void setCompany_name(String company_name) {
+    this.company_name = company_name;
+}
+
+public String getEmail() {
+        return email;
+    }
 
 public void setEmail(String email) {
 this.email = email;

@@ -21,7 +21,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.whysly.alimseolap1.R;
-import com.whysly.alimseolap1.Util.OpenApp;
 import com.whysly.alimseolap1.models.daos.NotificationDao;
 import com.whysly.alimseolap1.models.databases.NotificationDatabase;
 import com.whysly.alimseolap1.models.entities.NotificationEntity;
@@ -37,41 +36,48 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     int lastPosition;
         private List<NotificationEntity> entities = new ArrayList<>();
 
+
+    public interface OnItemClickListener {
+        void onItemClick(View v, long server_id) ;
+    }
+
+    // 리스너 객체 참조를 저장하는 변수
+    private RecyclerViewAdapter.OnItemClickListener mListener = null ;
+
+    // OnItemClickListener 리스너 객체 참조를 어댑터에 전달하는 메서드
+    public void setOnItemClickListener(RecyclerViewAdapter.OnItemClickListener listener) {
+        this.mListener = listener ;
+    }
     public RecyclerViewAdapter(Context context) {
             this.context = context;
             this.activity =  (Activity)context;
-    }
 
+    }
     @Override
     public int getItemCount() {
         Log.d("준영_갱신", "getItemCount: 실행됨");
         return entities.size();
         //return notiData.size();
     }
-
     @Override
     public long getItemId(int position) {
         //NotiData data = notiData.get(position);
         //return data.getNoti_id();
         return  entities.get(position).id;
     }
-
     public void setEntities(List<NotificationEntity> entities) {
         this.entities = entities;
         notifyDataSetChanged();
         notifyItemInserted(entities.size() - 1);
     }
-
     public void setSampleEntities(List<NotificationEntity> entities) {
         this.entities = entities;
         notifyDataSetChanged();
     }
 
-
-
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_item2, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_item, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);        return viewHolder;
 
   /*    else if(false) {
@@ -149,11 +155,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             ai = null;
         }
         final String applicationName = (String) (ai != null ? pm.getApplicationLabel(ai) : "(unknown)");
-        holder.app_name.setText(applicationName);
+        holder.app_name.setText(data.app_name);
 //        holder.package_name.setText(data.getPkg_name());
         holder.noti_id.setText(Integer.toString((int) data.id));
         holder.notiTitle.setText(data.title);
         holder.noti_category.setText(data.category);
+
 
     }
 
@@ -172,12 +179,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void removeItemView(int position, String uid) {
         //db에서도 값을 지웁니다.
         Log.d("지웁니다", "noti_idx2: "+position);
-        long long_noti_idx = getItemId(position);
-        NotificationDatabase  db = NotificationDatabase.getNotificationDatabase(context, uid);
         entities.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, entities.size()); // 지워진 만큼 다시 채워넣기.
-
     }
 
 
@@ -226,21 +230,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 @Override
                 public void onClick(View view) {
 
-
-                    //Intent intent = new Intent("intent_redirect");
-                    //intent.putExtra("adapterposition", getAdapterPosition());
-                    //LocalBroadcastManager.getInstance(activity).sendBroadcast(intent);
-                    if(entities.get(getAdapterPosition()).redirecting_url != null ) {
-                        String packageName = entities.get(getAdapterPosition()).redirecting_url;
-                        long server_id = entities.get(getAdapterPosition()).server_id;
-                        OpenApp.openApp(context, packageName, server_id);
-                    } else {
-
+                    int pos = getAdapterPosition();
+                    long server_id = entities.get(getAdapterPosition()).server_id;
+                    if (pos != RecyclerView.NO_POSITION) {
+                        // 리스너 객체의 메서드 호출.
+                        if (mListener != null) {
+                            mListener.onItemClick(view, server_id);
+                        }
                     }
 
-
-
-                }
+            }
             });
 
 

@@ -77,7 +77,7 @@ public class SignUpActivity extends AppCompatActivity  {
                 }
                 //loadingProgressBar.setVisibility(View.GONE);
                 if (loginResult.getError() != null) {
-                    showLoginFailed(loginResult.getError());
+                    showSignUpFailed(loginResult.getError());
                 }
                 if (loginResult.getSuccess() != null) {
                     updateUiWithUser(loginResult.getSuccess());
@@ -126,7 +126,7 @@ public class SignUpActivity extends AppCompatActivity  {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    loginViewModel.login(usernameEditText.getText().toString(),
+                    next(usernameEditText.getText().toString(),
                             passwordEditText.getText().toString());
                 }
                 return false;
@@ -184,15 +184,15 @@ public class SignUpActivity extends AppCompatActivity  {
 
     }
 
-    private void showLoginFailed(@StringRes Integer errorString) {
-        Toast.makeText(getApplicationContext(), errorString + "로그인에 실패하였습니다. 다시 로그인 해주세요.", Toast.LENGTH_SHORT).show();
+    private void showSignUpFailed(@StringRes Integer errorString) {
+        Toast.makeText(getApplicationContext(), errorString + "회원가입에 실패하였습니다.", Toast.LENGTH_SHORT).show();
     }
 
     private void next(String email, String password) {
         Intent intent = new Intent (SignUpActivity.this, EditMyProfile.class);
         intent.putExtra("email", email);
         intent.putExtra("password", password);
-        intent.putExtra("from", "signup");
+        intent.putExtra("from", 1);
         startActivity(intent);
         finish();
         // [START create_user_with_email]

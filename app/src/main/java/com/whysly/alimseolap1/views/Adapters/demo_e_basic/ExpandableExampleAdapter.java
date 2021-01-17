@@ -316,7 +316,7 @@ public class ExpandableExampleAdapter
             ai = null;
         }
         final String applicationName = (String) (ai != null ? pm.getApplicationLabel(ai) : "(unknown)");
-        holder.app_name.setText(applicationName);
+        holder.app_name.setText(data.app_name);
 //        holder.package_name.setText(data.getPkg_name());
         holder.noti_id.setText(Integer.toString((int) data.id));
         holder.notiTitle.setText(data.title);

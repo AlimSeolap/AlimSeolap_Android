@@ -69,16 +69,13 @@ public class NegFragment extends Fragment {
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         LottieAnimationView lottieAnimationView = view.findViewById(R.id.empty_noti);
         pref = getContext().getSharedPreferences("data", Context.MODE_PRIVATE);
-
-        recyclerView =(RecyclerViewEmptySupport) view.findViewById(R.id.recycler1);
+        //recyclerView =(RecyclerViewEmptySupport) view.findViewById(R.id.recycler1);
         linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
         pref = getContext().getSharedPreferences("data", Context.MODE_PRIVATE);
-
         recyclerView.setLayoutManager(linearLayoutManager);
         //recyclerView.setLayoutManager(linearLayoutManager);
-
         recyclerViewAdapter = new RecyclerViewAdapter(getContext());
         //recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.setAdapter(recyclerViewAdapter);
@@ -88,22 +85,17 @@ public class NegFragment extends Fragment {
         if (animator instanceof SimpleItemAnimator) {
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);
         }
-
         model = new ViewModelProvider(requireActivity(), new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())).get(MainViewModel.class);
         model.getNegativeNotification().observe(getViewLifecycleOwner(), entities -> {
             recyclerViewAdapter.setEntities(entities);
             recyclerView.smoothScrollToPosition(recyclerViewAdapter.getItemCount());
         });
-
         if (recyclerViewAdapter.getItemCount() == 0) {
             lottieAnimationView.setVisibility(View.VISIBLE);
         }
         else lottieAnimationView.setVisibility(View.INVISIBLE);
-
         Log.d("MainFragment", "뷰생성됩.");
-
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
-
         return view;
 
     }
@@ -133,7 +125,7 @@ public class NegFragment extends Fragment {
 //            //  notidata.get(intent.getIntExtra("position", 0));
 //            // intent ..
 //        }
-//    };
+//    }
 
     final ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
         @Override
@@ -274,8 +266,6 @@ public class NegFragment extends Fragment {
                     System.out.println("알림데이터 전송성공");
                     Log.d("현우", response.toString());
                     Log.d("현우", retrofit.toString());
-
-
                 }
 
                 @Override

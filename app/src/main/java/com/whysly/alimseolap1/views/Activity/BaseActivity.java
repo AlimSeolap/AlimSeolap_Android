@@ -8,7 +8,20 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
+
+    public void progressON() {
+        BaseApplication.getInstance().progressON(this, "로딩중");
+    }
+
+    public void progressON(String message) {
+        BaseApplication.getInstance().progressON(this, message);
+    }
+
+    public void progressOFF() {
+        BaseApplication.getInstance().progressOFF();
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,6 +37,7 @@ public class BaseActivity extends AppCompatActivity {
             getWindow().setStatusBarColor(Color.BLACK);
         }
     }
+
 
 
 }

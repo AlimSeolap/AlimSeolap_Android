@@ -7,30 +7,16 @@
         xmlns:android="http://schemas.android.com/apk/res/android">
 
 
-        <com.whysly.alimseolap1.views.Adapters.RecyclerViewEmptySupport
-            tools:listitem="@layout/recyclerview_item"
-            android:id="@+id/recycler1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:minHeight="300dp"
-            android:orientation="vertical"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            android:layoutAnimation="@anim/layout_animation"
-            android:visibility="visible"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" >
+    <WebView
+        android:id="@+id/webViewmain"
+        android:layout_width="300dp"
+        android:layout_height="167dp"
+        android:foregroundGravity="center_horizontal"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="5dp"></WebView>
 
-        </com.whysly.alimseolap1.views.Adapters.RecyclerViewEmptySupport>
 
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/empty_noti"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_gravity="center"
-            android:background="@color/mdtp_white"
-            app:lottie_autoPlay="true"
-            app:lottie_loop="true"
-            app:lottie_repeatMode="restart"
-            app:lottie_rawRes="@raw/empty_notification"
-            android:visibility="visible"/>
+
     </FrameLayout>
 

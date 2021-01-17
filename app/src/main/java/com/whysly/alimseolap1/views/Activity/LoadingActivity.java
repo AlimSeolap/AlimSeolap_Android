@@ -21,7 +21,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class LoadingActivity extends Activity {
+public class LoadingActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +37,7 @@ public class LoadingActivity extends Activity {
             intent.putExtra("from", "loading");
             startLoading(intent);
         }else {
+            Log.d("token", pref.getString("token", ""));
             Call<JsonObject> call_userinfo = service.getMe(pref.getString("token", ""));
             call_userinfo.enqueue(new Callback<JsonObject>() {
                 @Override
@@ -46,7 +47,7 @@ public class LoadingActivity extends Activity {
                     Log.d("postSignUpSNS", response.body().toString());
                     try {
                         JSONObject object = new JSONObject(response.body().toString());
-                        if (object.getString("finished").equals("false")) {
+                        if (!object.getBoolean("finished") ) {
                             Intent intent = new Intent(LoadingActivity.this, EditMyProfile.class);
                             intent.putExtra("from", "loading");
 
@@ -70,12 +71,14 @@ public class LoadingActivity extends Activity {
         }
 
     }
+
     private void startLoading(Intent intent) {
         Handler handler = new Handler();
 
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                progressON();
                 startActivity(intent);
                 finish();
             }

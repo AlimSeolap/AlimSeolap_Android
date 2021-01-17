@@ -58,12 +58,10 @@ public class GameRecyclerViewAdapter extends RecyclerView.Adapter<GameRecyclerVi
         //클릭리스너
         viewHolder.setOnItemClickListener(listener);
     }
-
     //아이템을 한개 추가해주고싶을때
     public  void addItem(GameNotiItem item){
         items.add(item);
     }
-
     //한꺼번에 추가해주고싶을때
     public void addItems(ArrayList<GameNotiItem> items){
         this.items = items;
@@ -72,17 +70,12 @@ public class GameRecyclerViewAdapter extends RecyclerView.Adapter<GameRecyclerVi
     public void removeItem(int position) {
         items.remove(position);
         notifyItemRemoved(position);
-        //notifyItemChanged(position)
         notifyItemRangeChanged(position, items.size());
     }
-
-
 
     public GameNotiItem getItem(int position){
         return  items.get(position);
     }
-
-
 
     //클릭리스너관련
     public void setOnItemClickListener(OnItemClickListener listener){
@@ -116,8 +109,6 @@ public class GameRecyclerViewAdapter extends RecyclerView.Adapter<GameRecyclerVi
             });
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         }
-
-
         //setItem 메소드는 SingerItem 객체를 전달받아 뷰홀더 안에 있는 뷰에 데이터를 설정하는 역할을 합니다.
         public void setItem(GameNotiItem item) {
             app_name.setText(item.getName());
@@ -125,7 +116,6 @@ public class GameRecyclerViewAdapter extends RecyclerView.Adapter<GameRecyclerVi
             noti_date.setText(item.getNoti_date());
             notitext.setText(item.getNotitext());
         }
-
         //클릭이벤트처리
         public void setOnItemClickListener(OnItemClickListener listener){
             this.listener = listener;

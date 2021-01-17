@@ -41,6 +41,9 @@ public interface MyService {
     @POST("messages")
     Call<JsonElement> postGameMessageEval(@Header("Authorization") String value, @Body JsonObject jsonObject);
 
+    @Multipart
+    @POST("sign-up")
+    Call<User> signMeUp(@PartMap Map<String, RequestBody> m, @Part MultipartBody.Part profile_img);
 
 
 
@@ -78,7 +81,8 @@ public interface MyService {
 
     @Multipart
     @PATCH("me")
-    Call<User> patchMe(@Header("Authorization") String value, @PartMap Map<String, RequestBody> m, @Part MultipartBody.Part profile_img);
+    Call<JsonObject> patchMe(@Header("Authorization") String value, @PartMap Map<String, RequestBody> m, @Part MultipartBody.Part profile_img);
+
 
     @PATCH("user/messages/{id}/checked")
     Call<JsonObject> patchChecked(@Header("Authorization") String value, @Path("id") String id, @Body JsonObject jsonObject);

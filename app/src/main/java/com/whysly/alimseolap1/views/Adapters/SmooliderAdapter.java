@@ -4,7 +4,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
-import com.whysly.alimseolap1.views.Fragment.NegFragment;
 import com.whysly.alimseolap1.views.Fragment.PosFragment;
 
 
@@ -27,7 +26,7 @@ public class SmooliderAdapter extends FragmentStatePagerAdapter {
                 PosFragment tab1 = new PosFragment();
                 return tab1;
             case 1:
-                NegFragment tab2 = new NegFragment();
+                PosFragment tab2 = new PosFragment();
                 return tab2;
 
             default:
